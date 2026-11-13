@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GQR Reliability & Stress Lab - Operations Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS per file Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- Firebase Compat CDNs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- Header Principale -->
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md">
+                    <i class="fa-solid fa-microchip text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">GQR Reliability & Stress Lab</h1>
+                    <p class="text-xs text-slate-400">Operations Suite & Cloud Management</p>
+                </div>
+            </div>
+            
+            <!-- Indicatore di Stato Cloud / Locale -->
+            <div id="status-badge" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
+                <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span id="status-text">Inizializzazione in corso...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu di Navigazione -->
+    <nav class="bg-slate-800/60 border-b border-slate-700/60 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto py-2">
+            <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow">
+                <i class="fa-solid fa-fire mr-2"></i>Forni & Stress
+            </button>
+            <button onclick="switchTab('inventory')" id="btn-tab-inventory" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700">
+                <i class="fa-solid fa-boxes-stacked mr-2"></i>Inventario BIB
+            </button>
+            <button onclick="switchTab('maintenance')" id="btn-tab-maintenance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700">
+                <i class="fa-solid fa-wrench mr-2"></i>Manutenzione
+            </button>
+            <button onclick="switchTab('logbook')" id="btn-tab-logbook" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700">
+                <i class="fa-solid fa-book-open mr-2"></i>Logbook Turni
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenuto Principale -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+        
+        <!-- Tab Forni -->
+        <section id="tab-ovens" class="tab-content space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-fire text-blue-500 mr-2"></i>Stato Forni (HTOL, HAST, TC, THB)</h2>
+                <button onclick="addOven()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Aggiungi Forno
+                </button>
+            </div>
+            <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Generato via JS -->
+            </div>
+        </section>
+
+        <!-- Tab Inventario -->
+        <section id="tab-inventory" class="tab-content hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-500 mr-2"></i>Inventario Schede & BIB</h2>
+                <div class="flex gap-2">
+                    <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow cursor-pointer transition">
+                        <i class="fa-solid fa-file-excel mr-1"></i> Importa Excel
+                        <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcel(event)">
+                    </label>
+                    <button onclick="exportExcel()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                        <i class="fa-solid fa-download mr-1"></i> Esporta
+                    </button>
+                </div>
+            </div>
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-900/50 border-b border-slate-700 text-slate-400">
+                                <th class="p-3">Codice / Nome</th>
+                                <th class="p-3">Lotto</th>
+                                <th class="p-3">Quantità</th>
+                                <th class="p-3">Posizione Rack</th>
+                                <th class="p-3">Stato</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            <!-- Generato via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Manutenzione -->
+        <section id="tab-maintenance" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-wrench text-amber-500 mr-2"></i>Ticket Manutenzione</h2>
+                <button onclick="addMaintenanceTicket()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Ticket
+                </button>
+            </div>
+            <div id="maintenance-list" class="space-y-3">
+                <!-- Generato via JS -->
+            </div>
+        </section>
+
+        <!-- Tab Logbook -->
+        <section id="tab-logbook" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-book-open text-purple-500 mr-2"></i>Passaggio Consegne Turno</h2>
+                <button onclick="addLogEntry()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Scrivi Nota Turno
+                </button>
+            </div>
+            <div id="logbook-list" class="space-y-3">
+                <!-- Generato via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
+        GQR Reliability & Stress Lab Operations Suite &bull; Cloud Synchronized
+    </footer>
+
+    <!-- Script Applicativo Anti-Crash & Firebase -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
+            authDomain: "gqr-lab-db.firebaseapp.com",
+            databaseURL: "https://gqr-lab-db-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "gqr-lab-db",
+            storageBucket: "gqr-lab-db.firebasestorage.app",
+            messagingSenderId: "390584430231",
+            appId: "1:390584430231:web:0b8a4347301a3c4bfe83d2",
+            measurementId: "G-QGYS3WKDX2"
+        };
+
+        let db = null;
+        let isCloudActive = false;
+
+        let appState = {
+            ovens: [
+                { id: 1, name: 'Forno HTOL 01', temp: '125°C', status: 'Operativo', lot: 'LOT-9821' },
+                { id: 2, name: 'Forno HAST 02', temp: '130°C', status: 'In Stress', lot: 'LOT-9822' },
+                { id: 3, name: 'Camera TC 03', temp: '-40°C / 125°C', status: 'Manutenzione', lot: 'N/D' }
+            ],
+            inventory: [
+                { code: 'BIB-001', lot: 'L-A1', qty: 45, rack: 'Rack A - Ripiano 1', status: 'Disponibile' },
+                { code: 'BIB-002', lot: 'L-A2', qty: 30, rack: 'Rack A - Ripiano 2', status: 'In Test' }
+            ],
+            maintenance: [
+                { id: 1, title: 'Calibrazione sensore umidità HAST', date: '2026-06-06', status: 'Aperto', priority: 'Alta' }
+            ],
+            logbook: [
+                { id: 1, author: 'Turno Mattina', date: '2026-06-06 14:00', text: 'Completato carico forno HTOL 01 senza anomalie.' }
+            ]
+        };
+
+        function initApp() {
+            try {
+                if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    db = firebase.database();
+                    
+                    db.ref('gqr_lab_data').on('value', (snapshot) => {
+                        const val = snapshot.val();
+                        if (val) {
+                            appState = val;
+                            renderAll();
+                        } else {
+                            db.ref('gqr_lab_data').set(appState);
+                        }
+                        updateStatus(true);
+                    }, (error) => {
+                        console.warn("Errore sync Firebase, fallback locale:", error);
+                        updateStatus(false);
+                        loadLocal();
+                    });
+                } else {
+                    updateStatus(false);
+                    loadLocal();
+                }
+            } catch (e) {
+                console.warn("Eccezione inizializzazione cloud:", e);
+                updateStatus(false);
+                loadLocal();
+            }
+            renderAll();
+        }
+
+        function updateStatus(active) {
+            isCloudActive = active;
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            if (active) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+                text.innerText = "Cloud Sincronizzato (Live)";
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                text.innerText = "Modalità Locale (Offline)";
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('gqr_lab_state', JSON.stringify(appState));
+                if (isCloudActive && db) {
+                    db.ref('gqr_lab_data').set(appState);
+                }
+            } catch (e) {
+                console.error("Errore salvataggio stato:", e);
+            }
+        }
+
+        function loadLocal() {
+            try {
+                const saved = localStorage.getItem('gqr_lab_state');
+                if (saved) {
+                    appState = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error("Errore caricamento locale:", e);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700";
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tabId}`).className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow";
+        }
+
+        function renderAll() {
+            renderOvens();
+            renderInventory();
+            renderMaintenance();
+            renderLogbook();
+        }
+
+        function renderOvens() {
+            const container = document.getElementById('ovens-grid');
+            container.innerHTML = appState.ovens.map(o => `
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-base">${o.name}</h3>
+                            <span class="px-2 py-0.5 rounded text-xs font-semibold ${o.status === 'Operativo' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">${o.status}</span>
+                        </div>
+                        <p class="text-sm text-slate-400 mb-1"><i class="fa-solid fa-temperature-high mr-1 text-red-400"></i> Setpoint: <b>${o.temp}</b></p>
+                        <p class="text-sm text-slate-400"><i class="fa-solid fa-barcode mr-1 text-blue-400"></i> Lotto: <b>${o.lot}</b></p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700 flex justify-end gap-2">
+                        <button onclick="editOven(${o.id})" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded transition">Modifica</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventory-table-body');
+            tbody.innerHTML = appState.inventory.map(i => `
+                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                    <td class="p-3 font-medium">${i.code}</td>
+                    <td class="p-3 text-slate-300">${i.lot}</td>
+                    <td class="p-3 text-slate-300">${i.qty}</td>
+                    <td class="p-3 text-slate-300">${i.rack}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30">${i.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderMaintenance() {
+            const container = document.getElementById('maintenance-list');
+            container.innerHTML = appState.maintenance.map(m => `
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center shadow">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-200">${m.title}</h4>
+                        <p class="text-xs text-slate-400 mt-1">Data: ${m.date} &bull; Priorità: <span class="text-amber-400 font-medium">${m.priority}</span></p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">${m.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderLogbook() {
+            const container = document.getElementById('logbook-list');
+            container.innerHTML = appState.logbook.map(l => `
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-xs text-purple-400">${l.author}</span>
+                        <span class="text-xs text-slate-500">${l.date}</span>
+                    </div>
+                    <p class="text-sm text-slate-300">${l.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function addOven() {
+            const name = prompt("Nome del nuovo forno:");
+            if (!name) return;
+            appState.ovens.push({ id: Date.now(), name, temp: '25°C', status: 'Operativo', lot: 'N/D' });
+            saveState();
+            renderAll();
+        }
+
+        function editOven(id) {
+            const oven = appState.ovens.find(o => o.id === id);
+            if (!oven) return;
+            const newLot = prompt("Inserisci nuovo lotto in prova:", oven.lot);
+            if (newLot !== null) {
+                oven.lot = newLot;
+                saveState();
+                renderAll();
+            }
+        }
+
+        function addMaintenanceTicket() {
+            const title = prompt("Descrivi il problema di manutenzione:");
+            if (!title) return;
+            appState.maintenance.unshift({ id: Date.now(), title, date: new Date().toISOString().split('T')[0], status: 'Aperto', priority: 'Media' });
+            saveState();
+            renderAll();
+        }
+
+        function addLogEntry() {
+            const text = prompt("Inserisci la nota per il turno:");
+            if (!text) return;
+            appState.logbook.unshift({ id: Date.now(), author: 'Operatore Lab', date: new Date().toLocaleString(), text });
+            saveState();
+            renderAll();
+        }
+
+        function exportExcel() {
+            const ws = XLSX.utils.json_to_sheet(appState.inventory);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Inventario BIB");
+            XLSX.writeFile(wb, "GQR_Lab_Inventario.xlsx");
+        }
+
+        function importExcel(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.SheetNames[0];
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                    if (rows.length > 0) {
+                        appState.inventory = rows.map(r => ({
+                            code: r.Codice || r.code || 'BIB-000',
+                            lot: r.Lotto || r.lot || 'N/D',
+                            qty: r.Quantita || r.qty || 0,
+                            rack: r.Rack || r.rack || 'N/D',
+                            status: r.Stato || r.status || 'Disponibile'
+                        }));
+                        saveState();
+                        renderAll();
+                        alert("Inventario importato con successo!");
+                    }
+                } catch(err) {
+                    alert("Errore durante l'importazione del file Excel.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
