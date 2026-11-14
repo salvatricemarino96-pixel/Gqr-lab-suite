@@ -42,7 +42,7 @@
     <nav class="bg-slate-800/60 border-b border-slate-700/60 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto py-2">
             <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow whitespace-nowrap">
-                <i class="fa-solid fa-layer-group mr-2"></i>Camere, Cicli & Arelis
+                <i class="fa-solid fa-layer-group mr-2"></i>Camere & Flusso Prove
             </button>
             <button onclick="switchTab('history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
                 <i class="fa-solid fa-clock-rotate-left mr-2"></i>Storico & Ricerca
@@ -65,21 +65,34 @@
     <!-- Contenuto Principale -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- TAB 1: CAMERE, CICLI & CONTROLLO ARELIS -->
+        <!-- TAB 1: CAMERE & FLUSSO PROVE -->
         <section id="tab-ovens" class="tab-content space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Stato Camere & Flusso Prove</h2>
-                    <p class="text-xs text-slate-400 mt-1">Gestione ordinata dei carichi, passaggi al testing elettrico e controllo Arelis.</p>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Dashboard Postazioni & Camere</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Gestione carichi, passaggi al testing e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
+            <!-- MONITOR LIVE BIB IN CAMERA (AGGIUNTO) -->
+            <div class="bg-slate-800/90 border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-blue-300 flex items-center">
+                        <i class="fa-solid fa-satellite-dish mr-2 text-blue-400 animate-pulse"></i>Monitor Live: BIB Occupate in Camera
+                    </h3>
+                    <span class="text-xs text-slate-400">Aggiornato in tempo reale dal mapping</span>
+                </div>
+                <div id="live-bibs-container" class="flex flex-wrap gap-2 pt-1">
+                    <!-- Pop-up dinamici a colori delle BIB in uso -->
+                </div>
+            </div>
+
             <!-- Filtri rapidi -->
             <div class="flex flex-wrap gap-2 text-xs">
-                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">Tutti i Carichi</button>
+                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium shadow">Tutti i Carichi</button>
                 <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-slate-800 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium">Da registrare su Arelis</button>
                 <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-slate-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-medium">Scade Oggi</button>
             </div>
@@ -121,12 +134,12 @@
         <section id="tab-mapping" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB</h2>
-                    <p class="text-xs text-slate-400 mt-1">Gestisci le posizioni slot e scarica il file ufficiale Excel con un click.</p>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB (Multi-Inserimento)</h2>
+                    <p class="text-xs text-slate-400 mt-1">Inserisci più BIB in un sol colpo e scarica il file ufficiale Excel.</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="openModal('modal-mapping')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga
+                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi BIB Multipli
                     </button>
                     <button onclick="exportMappingFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                         <i class="fa-solid fa-file-excel mr-1"></i> Esporta Excel
@@ -288,7 +301,7 @@
         </div>
     </div>
 
-    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD (MASCHERATA) -->
+    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD MASCHERATA -->
     <div id="modal-edit-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -299,7 +312,6 @@
                 <input type="hidden" id="edit-oven-id">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Password Lab</label>
-                    <!-- type="password" nasconde i caratteri con i pallini neri -->
                     <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                 </div>
                 <div>
@@ -327,29 +339,31 @@
         </div>
     </div>
 
+    <!-- MODALE MAPPING MULTIPLO -->
     <div id="modal-mapping" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-cyan-400">Nuova Riga Mapping</h3>
+                <h3 class="font-bold text-lg text-cyan-400">Inserimento Multiplo Mapping BIB</h3>
                 <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs text-slate-400 mb-1">Camera</label><input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
-                    <div><label class="block text-xs text-slate-400 mb-1">ID BIB</label><input id="in-map-bib" type="text" placeholder="BIB-014" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Slot Comune</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs text-slate-400 mb-1">Slot</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ID BIB (Inserisci multipli separati da virgola o spazio)</label>
+                    <textarea id="in-map-bibs" rows="2" placeholder="BIB-014, BIB-015, BIB-016..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
                     <div><label class="block text-xs text-slate-400 mb-1">Device</label><input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs text-slate-400 mb-1">Lotto</label><input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                     <div><label class="block text-xs text-slate-400 mb-1">Ricetta</label><input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-mapping')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewMapping()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 font-medium">Aggiungi</button>
+                <button onclick="saveNewMappingMulti()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 font-medium">Genera Tutte le BIB</button>
             </div>
         </div>
     </div>
@@ -418,7 +432,7 @@
 
     <!-- SCRIPT APPLICATIVO -->
     <script>
-        const LAB_PASSWORD = "gqr123"; // Password per sbloccare modifiche ed eliminazioni
+        const LAB_PASSWORD = "gqr123";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
@@ -445,7 +459,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Sistema aggiornato con flusso cicli e parser Excel corretto.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Monitor live BIB in camera integrato.' }
             ]
         };
 
@@ -460,7 +474,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v6').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v8').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -476,7 +490,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v6').set(appState);
+                            db.ref('gqr_lab_v8').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -499,15 +513,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v6', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v6').set(appState);
+                localStorage.setItem('gqr_lab_v8', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v8').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v6');
+                const saved = localStorage.getItem('gqr_lab_v8');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -534,6 +548,7 @@
         }
 
         function renderAll() {
+            renderLiveBibsInCamera();
             renderOvens();
             renderHistory();
             renderMapping();
@@ -542,7 +557,44 @@
             renderLogbook();
         }
 
-        // --- DASHBOARD CAMERE ORDINATA & GESTIONE CICLI ---
+        // --- MONITOR LIVE BIB IN CAMERA (COLORATO) ---
+        function renderLiveBibsInCamera() {
+            const container = document.getElementById('live-bibs-container');
+            if (!container) return;
+
+            // Trova le camere attualmente in run ("In Camera")
+            const activeCameras = appState.ovens.filter(o => o.status === 'In Camera').map(o => o.name);
+            
+            // Trova le BIB mappate su queste camere attive
+            const busyBibs = appState.mapping.filter(m => activeCameras.includes(m.cam));
+
+            if (!busyBibs.length) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">Nessuna BIB attualmente impegnata in camere attive. Tutte disponibili.</span>`;
+                return;
+            }
+
+            // Colori vivaci a comparsa (pop-up badges) per identificazione immediata
+            const colors = [
+                'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+                'bg-blue-500/20 text-blue-300 border-blue-500/40',
+                'bg-purple-500/20 text-purple-300 border-purple-500/40',
+                'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                'bg-amber-500/20 text-amber-300 border-amber-500/40'
+            ];
+
+            container.innerHTML = busyBibs.map((b, idx) => {
+                const colorClass = colors[idx % colors.length];
+                return `
+                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium shadow-sm transition transform hover:scale-105 ${colorClass}">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span><b>${b.bib}</b></span>
+                    <span class="opacity-75">(${b.cam})</span>
+                    <span class="bg-slate-900/60 px-1.5 py-0.5 rounded text-[10px] text-slate-300 ml-1">Lotto: ${b.lot}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // --- DASHBOARD CAMERE ORDINATA ---
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
@@ -649,7 +701,7 @@
             if (o.status === 'In Camera') {
                 o.accumulatedHours += o.stepHours;
                 o.status = 'Al Testing Elettrico';
-                o.arelisSynced = false; // Richiede verifica su Arelis per il passaggio al testing
+                o.arelisSynced = false;
                 appState.history.unshift({
                     date: new Date().toLocaleDateString('it-IT'),
                     name: o.name,
@@ -660,7 +712,7 @@
                 });
             } else {
                 o.status = 'In Camera';
-                o.arelisSynced = false; // Richiede verifica su Arelis per il rientro
+                o.arelisSynced = false;
             }
             saveState();
         }
@@ -734,7 +786,7 @@
             `).join('');
         }
 
-        // --- MAPPING BIB ---
+        // --- MAPPING BIB MULTIPLO ---
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
             if (!appState.mapping.length) {
@@ -754,20 +806,33 @@
             `).join('');
         }
 
-        function saveNewMapping() {
-            const bib = document.getElementById('in-map-bib').value.trim();
-            if (!bib) return alert("Inserisci ID BIB!");
-            appState.mapping.push({
-                id: Date.now(),
-                cam: document.getElementById('in-map-cam').value.trim() || 'N/D',
-                bib,
-                slot: document.getElementById('in-map-slot').value.trim() || 'Tutti',
-                dev: document.getElementById('in-map-dev').value.trim() || 'N/D',
-                lot: document.getElementById('in-map-lot').value.trim() || 'N/D',
-                rec: document.getElementById('in-map-rec').value.trim() || 'N/D'
+        function saveNewMappingMulti() {
+            const cam = document.getElementById('in-map-cam').value.trim() || 'N/D';
+            const slot = document.getElementById('in-map-slot').value.trim() || 'Tutti';
+            const rawBibs = document.getElementById('in-map-bibs').value.trim();
+            const dev = document.getElementById('in-map-dev').value.trim() || 'N/D';
+            const lot = document.getElementById('in-map-lot').value.trim() || 'N/D';
+            const rec = document.getElementById('in-map-rec').value.trim() || 'N/D';
+
+            if (!rawBibs) return alert("Inserisci almeno un ID BIB!");
+
+            const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
+
+            bibsArray.forEach(bib => {
+                appState.mapping.push({
+                    id: Date.now() + Math.random(),
+                    cam,
+                    bib: bib.trim(),
+                    slot,
+                    dev,
+                    lot,
+                    rec
+                });
             });
+
             closeModal('modal-mapping');
             saveState();
+            alert(`Generate con successo ${bibsArray.length} righe di mapping!`);
         }
 
         function deleteMapping(id) {
@@ -783,7 +848,7 @@
             XLSX.writeFile(wb, "GQR_Mapping.xlsx");
         }
 
-        // --- INVENTARIO & ARCHIVIO (CON PARSER EXCEL CORRETTO) ---
+        // --- INVENTARIO & ARCHIVIO ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
             if (!appState.inventory.length) {
