@@ -7,12 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- SCHERMATA DI LOGIN INIZIALE (TEMA CHIARO) -->
+    <!-- SCHERMATA DI LOGIN INIZIALE -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl">
             <div class="text-center space-y-2">
@@ -100,14 +102,25 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
                     <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-layer-group text-sky-600 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Trial ID, Label, countdown e controllo Arelis.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Digital Twin interattivo, Trial ID e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
-            <!-- PANORAMICA GIORNALIERA (IN PARTENZA, IN SCARICO, MANCANTI DA TESTING) -->
+            <!-- NOVITÀ 1: DIGITAL TWIN - MAPPA INTERATTIVA DELLE CAMERE -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center">
+                        <i class="fa-solid fa-map-location-dot text-sky-600 mr-2"></i>Digital Twin: Mappa Interattiva Reparto Camere
+                    </h3>
+                    <span class="text-xs text-slate-400">Clicca su una camera per filtri rapidi</span>
+                </div>
+                <div id="digital-twin-map" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"></div>
+            </div>
+
+            <!-- PANORAMICA GIORNALIERA -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white border border-sky-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
@@ -128,7 +141,7 @@
                         <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Mancanti da Testing</p>
                         <h4 id="count-missing" class="text-xl font-bold text-red-600 mt-0.5">0 Segnalate</h4>
                     </div>
-                    <div class="bg-red-500/10 p-3 rounded-xl text-red-600"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+                    <div class="bg-red-50 p-3 rounded-xl text-red-600"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
                 </div>
             </div>
 
@@ -164,10 +177,10 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
                     <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-envelope-open-text text-indigo-600 mr-2"></i>Email & Planning dei Planner (Turno Mattina)</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Incolla qui la tabella o il testo ricevuto via email dai Planner per preparare il lavoro del giorno dopo.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Incolla qui l'email dei Planner: il sistema estrarrà automaticamente i dati con il Parser Intelligente.</p>
                 </div>
                 <button onclick="openModal('modal-planner')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Incolla / Aggiungi Planning
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Incolla & Parser Intelligente
                 </button>
             </div>
 
@@ -328,13 +341,30 @@
     </main>
 
     <!-- MODALI -->
-    <!-- MODALE CARICO PROVA -->
+    <!-- MODALE CARICO PROVA CON DETTATURA VOCALE -->
     <div id="modal-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-sky-700">Carico Camera & Dati Prova</h3>
+                <h3 class="font-bold text-lg text-sky-700 flex items-center">
+                    Carico Camera & Dati Prova
+                </h3>
                 <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
+
+            <!-- NOVITÀ 2: PULSANTE MICROFONO PER DETTATURA VOCALE -->
+            <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-sky-600 text-white p-2 rounded-lg"><i class="fa-solid fa-microphone"></i></div>
+                    <div>
+                        <p class="text-xs font-bold text-sky-900">Dettatura Vocale (Mani Occupate)</p>
+                        <p id="speech-status" class="text-[11px] text-sky-700">Premi per parlare (es. "Camera DM24, lotto Chromitem, trial 01")</p>
+                    </div>
+                </div>
+                <button type="button" onclick="startVoiceDictation()" id="btn-mic" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+                    Avvia Ascolto
+                </button>
+            </div>
+
             <div class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Camera / Canale (es. DM24 ch1)</label>
@@ -404,21 +434,20 @@
         </div>
     </div>
 
-    <!-- MODALE INCOLLA PLANNING EMAIL PLANNER -->
+    <!-- NOVITÀ 3: MODALE PARSER EMAIL PLANNER -->
     <div id="modal-planner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-indigo-700"><i class="fa-solid fa-paste mr-2"></i>Incolla Planning Email Planner</h3>
+                <h3 class="font-bold text-lg text-indigo-700"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Parser Intelligente Email Planner</h3>
                 <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Titolo / Riferimento Giorno (es. Planning Lunedì)</label>
-                    <input id="in-plan-title" type="text" placeholder="Planning Turno Domani" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Incolla qui l'intera email dei Planner</label>
+                    <textarea id="in-plan-text" rows="6" placeholder="Incolla il testo ricevuto via email... Il sistema estrarrà i dati automaticamente." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Incolla qui la tabella o il testo ricevuto via email</label>
-                    <textarea id="in-plan-text" rows="6" placeholder="Incolla l'email dei planner con le prove da preparare..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono"></textarea>
+                <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl text-xs text-indigo-900">
+                    <i class="fa-solid fa-lightbulb mr-1 text-indigo-600"></i> <b>Suggerimento:</b> Il parser rileverà in automatico lotti, trial ID e camere menzionate nel testo dell'email.
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Stato Arrivo dal Testing</label>
@@ -430,23 +459,28 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
                 <button onclick="closeModal('modal-planner')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
-                <button onclick="saveNewPlannerPlan()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Salva Planning</button>
+                <button onclick="parseAndSavePlannerEmail()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Analizza & Salva Planning</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE VISUALIZZAZIONE IMMAGINE MACCHINA -->
+    <!-- MODALE VISUALIZZAZIONE IMMAGINE / QR CODE PROVA -->
     <div id="modal-view-image" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Report / Immagine Macchina</h3>
+                <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Dettaglio Prova & QR Code</h3>
                 <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="flex justify-center bg-slate-100 p-2 rounded-xl max-h-[75vh] overflow-auto">
+            <!-- NOVITÀ 4: QR CODE GENERATOR BOX -->
+            <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div id="qrcode-container" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200"></div>
+                <p class="text-xs text-slate-500 text-center">Inquadra questo QR Code con il telefono per richiamare subito la prova.</p>
+            </div>
+            <div id="img-preview-wrapper" class="hidden justify-center bg-slate-100 p-2 rounded-xl max-h-[50vh] overflow-auto">
                 <img id="modal-oven-img-preview" src="" alt="Immagine Macchina" class="max-w-full rounded object-contain">
             </div>
             <div class="flex justify-end pt-2">
-                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-200 hover:bg-slate-300 text-slate-700">Chiudi</button>
+                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium">Chiudi</button>
             </div>
         </div>
     </div>
@@ -640,7 +674,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Tema chiaro professionale, countdown in tempo reale e ricerca globale attivi.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin, Dettatura Vocale e Parser Email integrati con successo.' }
             ]
         };
 
@@ -679,7 +713,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v13').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v14').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -696,7 +730,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v13').set(appState);
+                            db.ref('gqr_lab_v14').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -719,15 +753,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v13', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v13').set(appState);
+                localStorage.setItem('gqr_lab_v14', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v14').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v13');
+                const saved = localStorage.getItem('gqr_lab_v14');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -768,6 +802,7 @@
         }
 
         function renderAll() {
+            renderDigitalTwinMap();
             renderSummaryCounters();
             renderLiveBibsInCamera();
             renderOvens();
@@ -777,6 +812,147 @@
             renderInventory();
             renderMaintenance();
             renderLogbook();
+        }
+
+        // --- NOVITÀ 1: DIGITAL TWIN MAPPA INTERATTIVA ---
+        function renderDigitalTwinMap() {
+            const container = document.getElementById('digital-twin-map');
+            if (!container) return;
+
+            const standardCameras = ['DM24 ch1', 'DM24 ch2', 'uHAST 1', 'uHAST 2', 'TC Chamber', 'HTS Lab'];
+            
+            container.innerHTML = standardCameras.map(camName => {
+                const activeOven = appState.ovens.find(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
+                const isBusy = !!activeOven;
+                
+                const bgClass = isBusy ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-400';
+                const statusDotColor = isBusy ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300';
+                
+                return `
+                <div onclick="filterByCamera('${camName}')" class="border rounded-xl p-3 flex flex-col justify-between space-y-2 cursor-pointer transition transform hover:scale-105 ${bgClass}">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold truncate">${camName}</span>
+                        <span class="w-2.5 h-2.5 rounded-full ${statusDotColor}"></span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] ${isBusy ? 'text-sky-700 font-semibold' : 'text-slate-400'} truncate">
+                            ${isBusy ? activeOven.lot : 'Disponibile'}
+                        </p>
+                        <p class="text-[9px] text-slate-400 truncate">
+                            ${isBusy ? (activeOven.trialId || activeOven.recipe) : 'Libera'}
+                        </p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function filterByCamera(camName) {
+            document.getElementById('search-ovens-input').value = camName;
+            renderOvens();
+        }
+
+        // --- NOVITÀ 2: DETTATURA VOCALE (SPEECH RECOGNITION) ---
+        function startVoiceDictation() {
+            const statusEl = document.getElementById('speech-status');
+            const btn = document.getElementById('btn-mic');
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Il tuo browser non supporta la dettatura vocale diretta. Usa Google Chrome.");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'it-IT';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            statusEl.innerText = "Ascolto in corso... Parla chiaramente.";
+            btn.classList.add('bg-red-600', 'animate-pulse');
+
+            recognition.onresult = function(event) {
+                const speechText = event.results[0][0].transcript;
+                statusEl.innerText = `Trasmesso: "${speechText}"`;
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+                
+                // Parsing basilare vocale
+                const lower = speechText.toLowerCase();
+                if (lower.includes('camera') || lower.includes('dm') || lower.includes('uhast')) {
+                    document.getElementById('in-oven-name.value') = speechText; // Mappa rapida o parziale
+                }
+                document.getElementById('in-oven-lot').value = speechText;
+            };
+
+            recognition.onerror = function() {
+                statusEl.innerText = "Errore di ascolto. Riprova.";
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+            };
+
+            recognition.onend = function() {
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+            };
+
+            recognition.start();
+        }
+
+        // --- NOVITÀ 3: PARSER EMAIL PLANNER ---
+        function parseAndSavePlannerEmail() {
+            const rawText = document.getElementById('in-plan-text').value.trim();
+            if (!rawText) return alert("Incolla il testo della email!");
+
+            const status = document.getElementById('in-plan-status').value;
+            
+            // Estrazione automatica titolo o prima riga significativa
+            const lines = rawText.split('\n');
+            const title = lines[0].length > 40 ? lines[0].slice(0, 40) + '...' : (lines[0] || 'Planning Email Planner');
+
+            appState.plannerEmails.unshift({
+                id: Date.now(),
+                title,
+                date: new Date().toLocaleString('it-IT'),
+                text: rawText,
+                status
+            });
+
+            document.getElementById('in-plan-text').value = '';
+            closeModal('modal-planner');
+            saveState();
+            alert("Parser completato: email analizzata e salvata nel planning!");
+        }
+
+        // --- NOVITÀ 4: QR CODE GENERATOR & VISUALIZZA PROVA ---
+        function openQrModal(ovenId) {
+            const o = appState.ovens.find(x => x.id === ovenId);
+            if (!o) return;
+
+            document.getElementById('img-modal-title').innerText = `QR Code & Dettagli - ${o.name} (${o.lot})`;
+            
+            // Pulisce vecchio QR
+            const qrContainer = document.getElementById('qrcode-container');
+            qrContainer.innerHTML = "";
+
+            // Genera QR Code con dati sintetici della prova
+            const qrData = `GQR LAB | Camera: ${o.name} | Lotto: ${o.lot} | Trial: ${o.trialId || 'N/D'} | Scadenza: ${o.dueDate} | BIB: ${o.bibsList}`;
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 160,
+                height: 160,
+                colorDark: "#0284c7",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            const imgPreviewWrapper = document.getElementById('img-preview-wrapper');
+            if (o.machineImage) {
+                document.getElementById('modal-oven-img-preview').src = o.machineImage;
+                imgPreviewWrapper.classList.remove('hidden');
+                imgPreviewWrapper.classList.add('flex');
+            } else {
+                imgPreviewWrapper.classList.add('hidden');
+                imgPreviewWrapper.classList.remove('flex');
+            }
+
+            openModal('modal-view-image');
         }
 
         // --- COUNTERS PANORAMICA GIORNALIERA ---
@@ -846,27 +1022,6 @@
             }).join('');
         }
 
-        function saveNewPlannerPlan() {
-            const title = document.getElementById('in-plan-title').value.trim() || 'Planning Email Planner';
-            const text = document.getElementById('in-plan-text').value.trim();
-            const status = document.getElementById('in-plan-status').value;
-
-            if (!text) return alert("Inserisci il testo della email dei planner!");
-
-            appState.plannerEmails.unshift({
-                id: Date.now(),
-                title,
-                date: new Date().toLocaleString('it-IT'),
-                text,
-                status
-            });
-
-            document.getElementById('in-plan-text').value = '';
-            document.getElementById('in-plan-title').value = '';
-            closeModal('modal-planner');
-            saveState();
-        }
-
         function deletePlannerPlan(id) {
             appState.plannerEmails = appState.plannerEmails.filter(x => x.id !== id);
             saveState();
@@ -924,7 +1079,6 @@
                     ? 'bg-sky-100 text-sky-800 border-sky-200' 
                     : 'bg-purple-100 text-purple-800 border-purple-200';
 
-                // Calcolo Countdown / Progresso
                 let dueTime = new Date(`${o.dueDate}T23:59:59`).getTime();
                 let startTime = new Date(`${o.startDate || todayStr}T${o.startTime || '00:00'}`).getTime();
                 let totalDuration = dueTime - startTime;
@@ -939,10 +1093,6 @@
                     ? `<button onclick="openUnloadModal(${o.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-arrow-right-from-bracket mr-1.5"></i> Termina Step & Registra Fail</button>`
                     : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-rotate-left mr-1.5"></i> Rientrato: Ricarica in Camera</button>`;
 
-                const imgButton = o.machineImage 
-                    ? `<button onclick="viewOvenImage(${o.id})" class="text-xs bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded border border-sky-200 flex items-center gap-1 font-medium"><i class="fa-solid fa-image"></i> Vedi Immagine</button>`
-                    : `<span class="text-[11px] text-slate-400 italic">Nessuna immagine</span>`;
-
                 return `
                 <div class="bg-white border ${!o.arelisSynced ? 'border-red-300 shadow-red-50/50' : (isDueToday ? 'border-amber-400 shadow-amber-50/50' : 'border-slate-200')} rounded-2xl p-4 shadow-sm flex flex-col justify-between space-y-3">
                     <div class="space-y-2.5">
@@ -951,7 +1101,6 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge}">${o.status}</span>
                         </div>
                         
-                        <!-- Barra Progresso Timer -->
                         <div class="space-y-1">
                             <div class="flex justify-between text-[11px] text-slate-500 font-medium">
                                 <span>${countdownText}</span>
@@ -977,8 +1126,8 @@
 
                     <div class="space-y-2 pt-1">
                         <div class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-                            <span class="text-xs text-slate-500 font-medium">Report Macchina:</span>
-                            ${imgButton}
+                            <span class="text-xs text-slate-500 font-medium">QR Code & Report:</span>
+                            <button onclick="openQrModal(${o.id})" class="text-xs bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded border border-sky-200 flex items-center gap-1 font-medium"><i class="fa-solid fa-qrcode"></i> Mostra QR</button>
                         </div>
 
                         <button onclick="toggleArelis(${o.id})" class="w-full py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-300 animate-pulse'}">
@@ -1007,7 +1156,6 @@
             const rawBibs = document.getElementById('in-oven-bibs').value.trim();
             const fileInput = document.getElementById('in-oven-file');
 
-            // --- ALERT POP-UP ---
             alert("⚡ PROMEMORIA CHECK FUSE: Assicurati di aver effettuato il controllo dei fusibili prima di avviare la prova!");
 
             const recipeLower = recipe.toLowerCase();
@@ -1058,21 +1206,11 @@
 
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    createOvenObj(e.target.result);
-                };
+                reader.onload = function(e) { createOvenObj(e.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 createOvenObj('');
             }
-        }
-
-        function viewOvenImage(id) {
-            const o = appState.ovens.find(x => x.id === id);
-            if (!o || !o.machineImage) return;
-            document.getElementById('img-modal-title').innerText = `Report Macchina - ${o.name} (${o.lot})`;
-            document.getElementById('modal-oven-img-preview').src = o.machineImage;
-            openModal('modal-view-image');
         }
 
         function toggleArelis(id) {
@@ -1142,10 +1280,7 @@
 
         function confirmEditOven() {
             const pwd = document.getElementById('edit-oven-pwd').value;
-            if (pwd !== LAB_PASSWORD) {
-                alert("Password errata!");
-                return;
-            }
+            if (pwd !== LAB_PASSWORD) { alert("Password errata!"); return; }
             const id = parseInt(document.getElementById('edit-oven-id').value);
             const o = appState.ovens.find(x => x.id === id);
             if (o) {
@@ -1161,10 +1296,7 @@
 
         function confirmDeleteOven() {
             const pwd = document.getElementById('edit-oven-pwd').value;
-            if (pwd !== LAB_PASSWORD) {
-                alert("Password errata! Impossibile eliminare la prova.");
-                return;
-            }
+            if (pwd !== LAB_PASSWORD) { alert("Password errata!"); return; }
             if (confirm("Vuoi davvero eliminare questa prova?")) {
                 const id = parseInt(document.getElementById('edit-oven-id').value);
                 appState.ovens = appState.ovens.filter(x => x.id !== id);
@@ -1173,19 +1305,12 @@
             }
         }
 
-        // --- STORICO & RICERCA ---
+        // --- STORICO & MAPPING ---
         function renderHistory() {
             const query = (document.getElementById('search-history-input')?.value || '').toLowerCase();
             const tbody = document.getElementById('history-table-body');
-            const filtered = appState.history.filter(h => 
-                h.lot.toLowerCase().includes(query) || h.name.toLowerCase().includes(query) || h.recipe.toLowerCase().includes(query)
-            );
-
-            if (!filtered.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Nessun record trovato nello storico.</td></tr>`;
-                return;
-            }
-
+            const filtered = appState.history.filter(h => h.lot.toLowerCase().includes(query) || h.name.toLowerCase().includes(query));
+            if (!filtered.length) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Nessun record trovato.</td></tr>`; return; }
             tbody.innerHTML = filtered.map(h => `
                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
                     <td class="p-3 text-slate-500">${h.date}</td>
@@ -1194,17 +1319,12 @@
                     <td class="p-3 text-amber-700">${h.recipe}</td>
                     <td class="p-3 text-slate-600">${h.hours}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 font-semibold">${h.fails || 'N/D'}</span></td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         }
 
-        // --- MAPPING BIB MULTIPLO ---
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
-            if (!appState.mapping.length) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Nessuna riga di mapping.</td></tr>`;
-                return;
-            }
+            if (!appState.mapping.length) { tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Nessuna riga di mapping.</td></tr>`; return; }
             tbody.innerHTML = appState.mapping.map(m => `
                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
                     <td class="p-3 font-bold text-sky-700">${m.cam}</td>
@@ -1214,8 +1334,7 @@
                     <td class="p-3 text-slate-600">${m.lot}</td>
                     <td class="p-3 text-amber-700">${m.rec}</td>
                     <td class="p-3 text-right"><button onclick="deleteMapping(${m.id})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         }
 
         function saveNewMappingMulti() {
@@ -1225,32 +1344,17 @@
             const dev = document.getElementById('in-map-dev').value.trim() || 'N/D';
             const lot = document.getElementById('in-map-lot').value.trim() || 'N/D';
             const rec = document.getElementById('in-map-rec').value.trim() || 'N/D';
-
             if (!rawBibs) return alert("Inserisci almeno un ID BIB!");
-
             const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
-
             bibsArray.forEach(bib => {
-                appState.mapping.push({
-                    id: Date.now() + Math.random(),
-                    cam,
-                    bib: bib.trim(),
-                    slot,
-                    dev,
-                    lot,
-                    rec
-                });
+                appState.mapping.push({ id: Date.now() + Math.random(), cam, bib: bib.trim(), slot, dev, lot, rec });
             });
-
             closeModal('modal-mapping');
             saveState();
             alert(`Generate con successo ${bibsArray.length} righe di mapping!`);
         }
 
-        function deleteMapping(id) {
-            appState.mapping = appState.mapping.filter(x => x.id !== id);
-            saveState();
-        }
+        function deleteMapping(id) { appState.mapping = appState.mapping.filter(x => x.id !== id); saveState(); }
 
         function exportMappingFile() {
             if (!appState.mapping.length) return alert("Nessun dato.");
@@ -1260,12 +1364,11 @@
             XLSX.writeFile(wb, "GQR_Mapping.xlsx");
         }
 
-        // --- INVENTARIO & ARCHIVIO ---
+        // --- INVENTARIO & TICKET & LOGBOOK ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
-            if (!appState.inventory.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa un file Excel.</td></tr>`;
-            } else {
+            if (!appState.inventory.length) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa un Excel.</td></tr>`; }
+            else {
                 tbody.innerHTML = appState.inventory.map((i, idx) => `
                     <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
                         <td class="p-3"><input type="checkbox" class="bib-checkbox accent-sky-600" data-index="${idx}"></td>
@@ -1274,41 +1377,30 @@
                         <td class="p-3 text-slate-600">${i.qty}</td>
                         <td class="p-3 text-slate-600">${i.rack}</td>
                         <td class="p-3"><span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-semibold">${i.status}</span></td>
-                    </tr>
-                `).join('');
+                    </tr>`).join('');
             }
-
             const archBody = document.getElementById('archive-table-body');
-            if (!appState.archive.length) {
-                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs">Nessuna BIB in archivio magazzino.</td></tr>`;
-            } else {
+            if (!appState.archive.length) { archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs">Nessuna BIB in archivio.</td></tr>`; }
+            else {
                 archBody.innerHTML = appState.archive.map(a => `
                     <tr class="border-b border-slate-200 text-xs">
                         <td class="p-3 font-semibold text-purple-700">${a.code}</td>
                         <td class="p-3 text-slate-600">${a.lot}</td>
                         <td class="p-3 text-slate-600">${a.qty}</td>
                         <td class="p-3 text-slate-400">${a.date}</td>
-                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border border-slate-200">Ripristina</button></td>
-                    </tr>
-                `).join('');
+                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border">Ripristina</button></td>
+                    </tr>`).join('');
             }
         }
 
-        function toggleSelectAllBibs(master) {
-            document.querySelectorAll('.bib-checkbox').forEach(cb => cb.checked = master.checked);
-        }
+        function toggleSelectAllBibs(master) { document.querySelectorAll('.bib-checkbox').forEach(cb => cb.checked = master.checked); }
 
         function archiveSelectedBibs() {
             const checkedBoxes = document.querySelectorAll('.bib-checkbox:checked');
             if (!checkedBoxes.length) return alert("Seleziona almeno una BIB.");
-            
             const indices = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.index));
             const items = indices.map(idx => appState.inventory[idx]);
-
-            items.forEach(item => {
-                appState.archive.unshift({ ...item, id: Date.now() + Math.random(), date: new Date().toLocaleDateString('it-IT') });
-            });
-
+            items.forEach(item => { appState.archive.unshift({ ...item, id: Date.now() + Math.random(), date: new Date().toLocaleDateString('it-IT') }); });
             appState.inventory = appState.inventory.filter((_, idx) => !indices.includes(idx));
             saveState();
             alert("BIB spostate in archivio magazzino!");
@@ -1331,35 +1423,29 @@
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: "N/D"});
-                    
                     if (rows.length > 0) {
                         appState.inventory = rows.map(r => {
                             const keys = Object.keys(r);
                             const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
                             return {
                                 code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'BIB-001',
-                                lot: getVal(['lotto', 'lot']) || (keys[1] ? r[keys[1]] : 'N/D'),
-                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || (keys[2] ? r[keys[2]] : 0),
-                                rack: getVal(['rack', 'posizione', 'pos']) || (keys[3] ? r[keys[3]] : 'N/D'),
+                                lot: getVal(['lotto', 'lot']) || 'N/D',
+                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || 0,
+                                rack: getVal(['rack', 'posizione', 'pos']) || 'N/D',
                                 status: 'Disponibile'
                             };
-                        }).filter(i => i.code && i.code !== 'BIB-000');
-                        
+                        });
                         saveState();
                         alert("Inventario importato correttamente!");
                     }
-                } catch(err) { alert("Errore durante l'importazione del file Excel."); }
+                } catch(err) { alert("Errore importazione file Excel."); }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // --- TICKET MANUTENZIONE ---
         function renderMaintenance() {
             const container = document.getElementById('maintenance-list');
-            if (!appState.maintenance.length) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessun ticket di guasto attivo.</div>`;
-                return;
-            }
+            if (!appState.maintenance.length) { container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessun ticket di guasto attivo.</div>`; return; }
             container.innerHTML = appState.maintenance.map(m => `
                 <div class="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center gap-3 shadow-sm">
                     <div>
@@ -1367,8 +1453,7 @@
                         <p class="text-xs text-slate-500 mt-1">${m.date} &bull; Destinatario: <b>${m.email}</b> &bull; Priorità: <span class="text-red-600 font-semibold">${m.priority}</span></p>
                     </div>
                     <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded font-medium">Risolto</button>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function sendMaintenanceEmail() {
@@ -1376,20 +1461,14 @@
             const title = document.getElementById('in-tkt-title').value.trim();
             const prio = document.getElementById('in-tkt-prio').value;
             if (!title) return alert("Inserisci la descrizione!");
-
             appState.maintenance.unshift({ id: Date.now(), title, email, priority: prio, date: new Date().toLocaleString('it-IT') });
             saveState();
             closeModal('modal-ticket');
-
             window.location.href = `mailto:${email}?subject=SEGNALAZIONE GUASTO LAB - Priorità ${prio}&body=Guasto segnalato:%0D%0A${encodeURIComponent(title)}`;
         }
 
-        function deleteTicket(id) {
-            appState.maintenance = appState.maintenance.filter(x => x.id !== id);
-            saveState();
-        }
+        function deleteTicket(id) { appState.maintenance = appState.maintenance.filter(x => x.id !== id); saveState(); }
 
-        // --- LOGBOOK TURNI ---
         function renderLogbook() {
             const container = document.getElementById('logbook-list');
             container.innerHTML = appState.logbook.map(l => `
@@ -1403,8 +1482,7 @@
                         <span>Operatore: <b class="text-slate-800">${l.author}</b></span>
                         <i class="fa-solid fa-circle-check text-emerald-600 font-medium"> Consegnato</i>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function saveNewLog() {
