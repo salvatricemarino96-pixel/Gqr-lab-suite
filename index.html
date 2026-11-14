@@ -523,7 +523,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Note sui Difetti / Fail riscontrati</label>
-                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto su pin..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
+                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto surriscaldamento pin..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
@@ -694,7 +694,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin in tab dedicata e gestione multi-prova per camera attivi.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin in tab dedicata, multi-prova e importazione inventario Excel corrette.' }
             ]
         };
 
@@ -733,7 +733,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v15').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v16').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -750,7 +750,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v15').set(appState);
+                            db.ref('gqr_lab_v16').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -773,15 +773,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v15', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v15').set(appState);
+                localStorage.setItem('gqr_lab_v16', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v16').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v15');
+                const saved = localStorage.getItem('gqr_lab_v16');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -842,7 +842,6 @@
             const standardCameras = ['DM24 ch1', 'DM24 ch2', 'uHAST 1', 'uHAST 2', 'TC Chamber', 'HTS Lab'];
             
             container.innerHTML = standardCameras.map(camName => {
-                // Trova TUTTE le prove attive (In Camera) per questa specifica postazione
                 const chamberOvens = appState.ovens.filter(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
                 const activeCount = chamberOvens.length;
                 
@@ -877,7 +876,6 @@
             }).join('');
         }
 
-        // Apre il modale con l'elenco completo di tutte le prove attive in quella camera
         function openChamberDetailModal(camName) {
             document.getElementById('chamber-detail-title').innerHTML = `<i class="fa-solid fa-door-closed mr-2 text-sky-600"></i>Postazione: ${camName}`;
             const listContainer = document.getElementById('chamber-detail-list');
@@ -910,7 +908,7 @@
             openModal('modal-chamber-detail');
         }
 
-        // --- DETTATURA VOCALE (CORRETTA) ---
+        // --- DETTATURA VOCALE ---
         function startVoiceDictation() {
             const statusEl = document.getElementById('speech-status');
             const btn = document.getElementById('btn-mic');
@@ -933,8 +931,6 @@
                 const speechText = event.results[0][0].transcript;
                 statusEl.innerText = `Trasmesso: "${speechText}"`;
                 btn.classList.remove('bg-red-600', 'animate-pulse');
-                
-                // Assegnazione corretta al campo input senza errori di sintassi
                 document.getElementById('in-oven-lot').value = speechText;
             };
 
@@ -973,7 +969,7 @@
             alert("Parser completato: email analizzata e salvata nel planning!");
         }
 
-        // --- QR CODE GENERATOR & VISUALIZZA PROVA ---
+        // --- QR CODE GENERATOR ---
         function openQrModal(ovenId) {
             const o = appState.ovens.find(x => x.id === ovenId);
             if (!o) return;
@@ -1465,6 +1461,7 @@
             saveState();
         }
 
+        // --- FUNZIONE IMPORT EXCEL CORRETTA E ROBUSTA ---
         function importExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1474,10 +1471,21 @@
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: "N/D"});
+                    
                     if (rows.length > 0) {
                         appState.inventory = rows.map(r => {
                             const keys = Object.keys(r);
-                            const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
+                            const getVal = (names) => { 
+                                for (let k of keys) {
+                                    const lowerK = k.toLowerCase().trim();
+                                    for (let n of names) {
+                                        if (lowerK === n || lowerK.includes(n) || n.includes(lowerK)) {
+                                            return r[k];
+                                        }
+                                    }
+                                }
+                                return null; 
+                            };
                             return {
                                 code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'BIB-001',
                                 lot: getVal(['lotto', 'lot']) || 'N/D',
@@ -1485,11 +1493,12 @@
                                 rack: getVal(['rack', 'posizione', 'pos']) || 'N/D',
                                 status: 'Disponibile'
                             };
-                        });
+                        }).filter(i => i.code && i.code !== 'N/D');
+                        
                         saveState();
                         alert("Inventario importato correttamente!");
                     }
-                } catch(err) { alert("Errore importazione file Excel."); }
+                } catch(err) { alert("Errore durante l'importazione del file Excel."); }
             };
             reader.readAsArrayBuffer(file);
         }
