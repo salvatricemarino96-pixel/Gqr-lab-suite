@@ -32,7 +32,7 @@
                 </div>
                 <div id="status-badge" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span id="status-text">Connessione...</span>
+                    <span id="status-text">Inizializzazione...</span>
                 </div>
             </div>
         </div>
@@ -74,7 +74,6 @@
                 </button>
             </div>
 
-            <!-- Filtri rapidi -->
             <div class="flex flex-wrap gap-2 text-xs">
                 <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">Tutti</button>
                 <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-slate-800 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium">Da registrare su Arelis</button>
@@ -178,7 +177,7 @@
 
     </main>
 
-    <!-- MODALE 1: NUOVO CARICO CAMERA -->
+    <!-- MODALI -->
     <div id="modal-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -226,7 +225,6 @@
         </div>
     </div>
 
-    <!-- MODALE 2: AGGIUNGI MAPPING BIB -->
     <div id="modal-mapping" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -246,12 +244,12 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Posizioni / Slot (es. 1-32)</label>
+                        <label class="block text-xs text-slate-400 mb-1">Posizioni / Slot</label>
                         <input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Codice Device / Pezzi</label>
-                        <input id="in-map-dev" type="text" placeholder="32 pz - STM32..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -261,7 +259,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Temp & Ricetta</label>
-                        <input id="in-map-rec" type="text" placeholder="125°C / HTOL_STD" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="in-map-rec" type="text" placeholder="125°C / HTOL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -277,12 +275,11 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-mapping')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewMapping()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 font-medium">Aggiungi al Mapping</button>
+                <button onclick="saveNewMapping()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 font-medium">Aggiungi</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE 3: TICKET MANUTENZIONE -->
     <div id="modal-ticket" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -292,7 +289,7 @@
             <div class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Macchina / Camera e Problema</label>
-                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Allarme temperatura" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Allarme" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Priorità</label>
@@ -310,7 +307,6 @@
         </div>
     </div>
 
-    <!-- MODALE 4: LOGBOOK TURNO -->
     <div id="modal-log" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -333,16 +329,17 @@
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Nota per il turno successivo</label>
-                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne, lotti al testing, Arelis da aggiornare..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></textarea>
+                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne, Arelis..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-log')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 font-medium">Pubblica Nota</button>
+                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 font-medium">Pubblica</button>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT APPLICATIVO ROBUSTO -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
@@ -382,8 +379,23 @@
             try {
                 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
                     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-                    db = firebase.database();
-                    db.ref('gqr_lab_v2').on('value', (snapshot) => {
+                    
+                    // Forziamo esplicitamente l'URL europeo per evitare blocchi in attesa
+                    db = firebase.database(undefined, firebaseConfig.databaseURL);
+                    
+                    let connected = false;
+                    const safetyTimer = setTimeout(() => {
+                        if (!connected) {
+                            console.warn("Timeout connessione cloud: passaggio a modalità locale.");
+                            updateStatus(false);
+                            loadLocal();
+                            renderAll();
+                        }
+                    }, 3500);
+
+                    db.ref('gqr_lab_v3').on('value', (snapshot) => {
+                        connected = true;
+                        clearTimeout(safetyTimer);
                         const val = snapshot.val();
                         if (val) {
                             appState = {
@@ -395,13 +407,25 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v2').set(appState);
+                            db.ref('gqr_lab_v3').set(appState);
                         }
                         updateStatus(true);
-                    }, () => { updateStatus(false); loadLocal(); });
-                } else { updateStatus(false); loadLocal(); }
-            } catch (e) { updateStatus(false); loadLocal(); }
-            renderAll();
+                    }, (error) => {
+                        clearTimeout(safetyTimer);
+                        updateStatus(false);
+                        loadLocal();
+                        renderAll();
+                    });
+                } else {
+                    updateStatus(false);
+                    loadLocal();
+                    renderAll();
+                }
+            } catch (e) {
+                updateStatus(false);
+                loadLocal();
+                renderAll();
+            }
         }
 
         function updateStatus(active) {
@@ -413,21 +437,21 @@
                 text.innerText = "Cloud Live";
             } else {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                text.innerText = "Offline";
+                text.innerText = "Modalità Locale";
             }
         }
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v2', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v2').set(appState);
+                localStorage.setItem('gqr_lab_v3', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v3').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v2');
+                const saved = localStorage.getItem('gqr_lab_v3');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -461,7 +485,6 @@
             renderLogbook();
         }
 
-        // --- TAB 1: CAMERE, CICLI & CONTROLLO ARELIS ---
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
@@ -502,7 +525,7 @@
                     ? '<i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Scarica e Manda al Testing'
                     : (o.status === 'Al Testing Elettrico'
                         ? '<i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera'
-                        : '<i class="fa-solid fa-play mr-1"></i> Riavvia Ciclo');
+                        : '<i class="fa-solid fa-play mr-1"></i> Riavvia');
 
                 return `
                 <div class="bg-slate-800 border ${!o.arelisSynced ? 'border-red-500/50' : 'border-slate-700'} rounded-xl p-4 shadow-lg flex flex-col justify-between space-y-3">
@@ -514,10 +537,9 @@
                         <p class="text-sm text-slate-200 mb-1"><i class="fa-solid fa-barcode mr-1.5 text-blue-400"></i><b>${o.lot}</b></p>
                         <p class="text-xs text-slate-400 mb-2"><i class="fa-solid fa-temperature-high mr-1.5 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
                         
-                        <!-- Avanzamento Ore Accumulate -->
                         <div class="bg-slate-900/70 rounded-lg p-2.5 border border-slate-700/70 text-xs space-y-1">
                             <div class="flex justify-between text-slate-300">
-                                <span>Step corrente: <b>+${o.stepHours}h</b></span>
+                                <span>Step: <b>+${o.stepHours}h</b></span>
                                 <span>Accumulate: <b>${o.accumulatedHours} / ${o.targetHours}h</b></span>
                             </div>
                             <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
@@ -526,11 +548,10 @@
                         </div>
                     </div>
 
-                    <!-- Controllo Arelis & Azioni -->
                     <div class="pt-2 border-t border-slate-700 space-y-2">
                         <button onclick="toggleArelis(${o.id})" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'}">
                             <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
-                            ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS (Clicca per confermare)'}
+                            ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS (Clicca)'}
                         </button>
 
                         <div class="flex gap-2">
@@ -548,7 +569,7 @@
 
         function saveNewOven() {
             const name = document.getElementById('in-oven-name').value.trim();
-            if (!name) return alert("Inserisci il nome della camera!");
+            if (!name) return alert("Inserisci il nome!");
             appState.ovens.unshift({
                 id: Date.now(),
                 name,
@@ -578,10 +599,7 @@
             if (o.status === 'In Camera') {
                 o.accumulatedHours = (o.accumulatedHours || 0) + (o.stepHours || 0);
                 o.status = 'Al Testing Elettrico';
-                o.arelisSynced = false; // Resetta spunta Arelis perché va registrato lo scarico/invio al testing
-            } else if (o.status === 'Al Testing Elettrico') {
-                o.status = 'In Camera';
-                o.arelisSynced = false; // Va registrato il rientro in camera su Arelis
+                o.arelisSynced = false;
             } else {
                 o.status = 'In Camera';
                 o.arelisSynced = false;
@@ -590,17 +608,16 @@
         }
 
         function deleteOven(id) {
-            if (confirm("Eliminare questa scheda camera?")) {
+            if (confirm("Eliminare questa scheda?")) {
                 appState.ovens = appState.ovens.filter(x => x.id !== id);
                 saveState();
             }
         }
 
-        // --- TAB 2: MAPPING RAPIDO BIB ---
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
             if (!appState.mapping.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">Nessuna riga di mapping. Clicca su "Aggiungi Riga Mapping".</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">Nessuna riga di mapping.</td></tr>`;
                 return;
             }
             tbody.innerHTML = appState.mapping.map(m => `
@@ -621,7 +638,7 @@
 
         function saveNewMapping() {
             const bib = document.getElementById('in-map-bib').value.trim();
-            if (!bib) return alert("Inserisci l'ID della BIB!");
+            if (!bib) return alert("Inserisci l'ID BIB!");
             appState.mapping.push({
                 id: Date.now(),
                 cam: document.getElementById('in-map-cam').value.trim() || 'N/D',
@@ -643,24 +660,16 @@
         }
 
         function exportMappingFile() {
-            if (!appState.mapping.length) return alert("Nessun dato di mapping da esportare.");
+            if (!appState.mapping.length) return alert("Nessun dato.");
             const formatted = appState.mapping.map(m => ({
-                "Camera": m.cam,
-                "ID BIB": m.bib,
-                "Posizioni / Slot": m.slot,
-                "Device / Pezzi": m.dev,
-                "Lotto": m.lot,
-                "Temperatura e Ricetta": m.rec,
-                "Inizio Prova": m.start,
-                "Fine Prevista": m.end
+                "Camera": m.cam, "ID BIB": m.bib, "Slot": m.slot, "Device": m.dev, "Lotto": m.lot, "Ricetta": m.rec, "Inizio": m.start, "Fine": m.end
             }));
             const ws = XLSX.utils.json_to_sheet(formatted);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Mapping BIB");
-            XLSX.writeFile(wb, `Mapping_GQR_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.writeFile(wb, "GQR_Mapping.xlsx");
         }
 
-        // --- TAB 3: INVENTARIO ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
             tbody.innerHTML = appState.inventory.map(i => `
@@ -686,22 +695,19 @@
                     if (rows.length > 0) {
                         appState.inventory = rows.map(r => {
                             const keys = Object.keys(r);
-                            const getVal = (names) => {
-                                for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k];
-                                return null;
-                            };
+                            const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
                             return {
-                                code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'N/D',
+                                code: getVal(['codice', 'code', 'bib', 'id bib']) || r[keys[0]] || 'N/D',
                                 lot: getVal(['lotto', 'lot']) || (keys[1] ? r[keys[1]] : 'N/D'),
-                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || (keys[2] ? r[keys[2]] : 0),
-                                rack: getVal(['rack', 'posizione', 'pos']) || (keys[3] ? r[keys[3]] : 'N/D'),
+                                qty: getVal(['quantita', 'quantità', 'qty']) || (keys[2] ? r[keys[2]] : 0),
+                                rack: getVal(['rack', 'posizione']) || (keys[3] ? r[keys[3]] : 'N/D'),
                                 status: getVal(['stato', 'status']) || 'Disponibile'
                             };
                         });
                         saveState();
-                        alert("Inventario importato correttamente!");
+                        alert("Importato con successo!");
                     }
-                } catch(err) { alert("Errore importazione Excel."); }
+                } catch(err) { alert("Errore Excel."); }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -710,10 +716,9 @@
             const ws = XLSX.utils.json_to_sheet(appState.inventory);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Inventario BIB");
-            XLSX.writeFile(wb, "GQR_Lab_Inventario.xlsx");
+            XLSX.writeFile(wb, "GQR_Inventario.xlsx");
         }
 
-        // --- TAB 4: MANUTENZIONE ---
         function renderMaintenance() {
             const container = document.getElementById('maintenance-list');
             container.innerHTML = appState.maintenance.map(m => `
@@ -734,11 +739,7 @@
             const title = document.getElementById('in-tkt-title').value.trim();
             if (!title) return;
             appState.maintenance.unshift({
-                id: Date.now(),
-                title,
-                date: new Date().toLocaleDateString('it-IT'),
-                status: 'Aperto',
-                priority: document.getElementById('in-tkt-prio').value
+                id: Date.now(), title, date: new Date().toLocaleDateString('it-IT'), status: 'Aperto', priority: document.getElementById('in-tkt-prio').value
             });
             closeModal('modal-ticket');
             saveState();
@@ -756,7 +757,6 @@
             saveState();
         }
 
-        // --- TAB 5: LOGBOOK TURNI ---
         function renderLogbook() {
             const container = document.getElementById('logbook-list');
             container.innerHTML = appState.logbook.map(l => `
@@ -792,4 +792,3 @@
     </script>
 </body>
 </html>
-
