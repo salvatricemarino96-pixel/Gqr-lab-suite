@@ -694,7 +694,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin in tab dedicata, multi-prova e importazione inventario Excel corrette.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Inventario Excel aggiornato con mappatura colonne Product, BIB S/N, Type, Equipment.' }
             ]
         };
 
@@ -733,7 +733,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v16').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v17').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -750,7 +750,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v16').set(appState);
+                            db.ref('gqr_lab_v17').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -773,15 +773,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v16', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v16').set(appState);
+                localStorage.setItem('gqr_lab_v17', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v17').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v16');
+                const saved = localStorage.getItem('gqr_lab_v17');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -1414,7 +1414,7 @@
         // --- INVENTARIO & TICKET & LOGBOOK ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
-            if (!appState.inventory.length) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa un Excel.</td></tr>`; }
+            if (!appState.inventory.length) { tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa il tuo file Excel.</td></tr>`; }
             else {
                 tbody.innerHTML = appState.inventory.map((i, idx) => `
                     <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
@@ -1461,7 +1461,7 @@
             saveState();
         }
 
-        // --- FUNZIONE IMPORT EXCEL CORRETTA E ROBUSTA ---
+        // --- FUNZIONE IMPORT EXCEL SPECIFICA PER LE TUE COLONNE (Product, BIB S/N, Type, Equipment, Location, Note) ---
         function importExcel(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1475,30 +1475,40 @@
                     if (rows.length > 0) {
                         appState.inventory = rows.map(r => {
                             const keys = Object.keys(r);
-                            const getVal = (names) => { 
+                            const getVal = (possibleNames) => {
                                 for (let k of keys) {
-                                    const lowerK = k.toLowerCase().trim();
-                                    for (let n of names) {
-                                        if (lowerK === n || lowerK.includes(n) || n.includes(lowerK)) {
+                                    const cleanK = k.toLowerCase().trim().replace(/[\s_\/-]/g, '');
+                                    for (let name of possibleNames) {
+                                        const cleanName = name.toLowerCase().trim().replace(/[\s_\/-]/g, '');
+                                        if (cleanK === cleanName || cleanK.includes(cleanName) || cleanName.includes(cleanK)) {
                                             return r[k];
                                         }
                                     }
                                 }
-                                return null; 
+                                return null;
                             };
+
+                            const code = getVal(['bibsn', 'bib s/n', 'bib', 'code', 'codice']) || 'N/D';
+                            const lot = getVal(['product', 'lotto', 'lot']) || 'N/D';
+                            const type = getVal(['type', 'ricetta', 'recipe']) || 'N/D';
+                            const equipment = getVal(['equipment', 'camera', 'machine']) || 'N/D';
+                            const location = getVal(['location', 'rack', 'posizione', 'pos']) || 'N/D';
+
                             return {
-                                code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'BIB-001',
-                                lot: getVal(['lotto', 'lot']) || 'N/D',
-                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || 0,
-                                rack: getVal(['rack', 'posizione', 'pos']) || 'N/D',
+                                code: String(code),
+                                lot: String(lot),
+                                qty: 1, // Default 1 pezzo per ogni BIB S/N
+                                rack: `${equipment} - ${location}`,
                                 status: 'Disponibile'
                             };
                         }).filter(i => i.code && i.code !== 'N/D');
                         
                         saveState();
-                        alert("Inventario importato correttamente!");
+                        alert(`Inventario importato correttamente! Letti ${appState.inventory.items || appState.inventory.length} elementi.`);
                     }
-                } catch(err) { alert("Errore durante l'importazione del file Excel."); }
+                } catch(err) { 
+                    alert("Errore durante l'importazione del file Excel. Assicurati che il formato sia corretto."); 
+                }
             };
             reader.readAsArrayBuffer(file);
         }
