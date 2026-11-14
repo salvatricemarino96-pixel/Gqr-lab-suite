@@ -70,24 +70,22 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
                 <div>
                     <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Gestione carichi, passaggi al testing e controllo Arelis.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Gestione ordinata dei carichi, mapping allegato, immagini macchina e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
-            <!-- MONITOR LIVE BIB IN CAMERA (AGGIUNTO) -->
+            <!-- MONITOR LIVE BIB IN CAMERA -->
             <div class="bg-slate-800/90 border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-blue-300 flex items-center">
                         <i class="fa-solid fa-satellite-dish mr-2 text-blue-400 animate-pulse"></i>Monitor Live: BIB Occupate in Camera
                     </h3>
-                    <span class="text-xs text-slate-400">Aggiornato in tempo reale dal mapping</span>
+                    <span class="text-xs text-slate-400">Aggiornato in tempo reale</span>
                 </div>
-                <div id="live-bibs-container" class="flex flex-wrap gap-2 pt-1">
-                    <!-- Pop-up dinamici a colori delle BIB in uso -->
-                </div>
+                <div id="live-bibs-container" class="flex flex-wrap gap-2 pt-1"></div>
             </div>
 
             <!-- Filtri rapidi -->
@@ -121,7 +119,7 @@
                                 <th class="p-3">Lotto</th>
                                 <th class="p-3">Ricetta & Temp</th>
                                 <th class="p-3">Ore Accumulate</th>
-                                <th class="p-3">Stato</th>
+                                <th class="p-3">Fail / Esito</th>
                             </tr>
                         </thead>
                         <tbody id="history-table-body"></tbody>
@@ -254,10 +252,11 @@
     </main>
 
     <!-- MODALI -->
+    <!-- MODALE CARICO PROVA CON MAPPING E IMMAGINE MACCHINA -->
     <div id="modal-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-blue-400">Carico Camera / Prova</h3>
+                <h3 class="font-bold text-lg text-blue-400">Carico Camera & Associazione Mapping/Immagine</h3>
                 <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
@@ -275,6 +274,16 @@
                         <input id="in-oven-recipe" type="text" placeholder="HTOL_125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                 </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Data Inizio</label>
+                        <input id="in-oven-startdate" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Ora Inizio</label>
+                        <input id="in-oven-starttime" type="time" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                    </div>
+                </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Temperatura</label>
@@ -285,9 +294,17 @@
                         <input id="in-oven-step" type="number" value="48" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Scadenza (Data)</label>
+                        <label class="block text-xs text-slate-400 mb-1">Data Scadenza</label>
                         <input id="in-oven-duedate" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
                     </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">BIB Coinvolte nella Prova (es. BIB-014, BIB-015, BIB-016...)</label>
+                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB qui per generare subito il mapping..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Allega Immagine / Report Macchina (Screenshot)</label>
+                    <input id="in-oven-file" type="file" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
                 </div>
                 <div class="flex items-center space-x-2 pt-1">
                     <input id="in-oven-arelis" type="checkbox" class="w-4 h-4 accent-emerald-500">
@@ -296,7 +313,51 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-blue-600 hover:bg-blue-500 font-medium">Salva Carico</button>
+                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-blue-600 hover:bg-blue-500 font-medium">Salva Carico & Allega</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE VISUALIZZAZIONE IMMAGINE MACCHINA -->
+    <div id="modal-view-image" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                <h3 id="img-modal-title" class="font-bold text-sm text-cyan-400">Report / Immagine Macchina</h3>
+                <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="flex justify-center bg-slate-900 p-2 rounded-xl max-h-[75vh] overflow-auto">
+                <img id="modal-oven-img-preview" src="" alt="Immagine Macchina" class="max-w-full rounded object-contain">
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-700 hover:bg-slate-600">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE SCARICO RAPIDO & REGISTRAZIONE FAIL PEZZI -->
+    <div id="modal-unload-fail" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-emerald-400"><i class="fa-solid fa-clipboard-check mr-2"></i>Scarico & Registrazione Fail</h3>
+                <button onclick="closeModal('modal-unload-fail')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <input type="hidden" id="unload-oven-id">
+                <div>
+                    <p id="unload-info-text" class="text-xs text-cyan-300 font-semibold mb-3 bg-slate-900 p-2.5 rounded-lg border border-slate-700"></p>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Numero Pezzi in Fail (Scarti)</label>
+                    <input id="in-unload-fails" type="number" value="0" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold text-amber-400">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Note sui Difetti / Fail riscontrati</label>
+                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto su pin..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
+                <button onclick="closeModal('modal-unload-fail')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
+                <button onclick="confirmUnloadWithFails()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 hover:bg-emerald-500 font-medium"><i class="fa-solid fa-check mr-1"></i> Conferma & Invia a Testing</button>
             </div>
         </div>
     </div>
@@ -451,7 +512,7 @@
 
         let appState = {
             ovens: [
-                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 48, accumulatedHours: 0, dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false }
+                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 48, accumulatedHours: 0, startDate: new Date().toISOString().slice(0,10), startTime: '08:00', dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false, machineImage: '', bibsList: 'BIB-012, BIB-013' }
             ],
             history: [],
             mapping: [],
@@ -459,7 +520,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Monitor live BIB in camera integrato.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Dashboard pulita, allegato immagini e mapping unificato.' }
             ]
         };
 
@@ -474,7 +535,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v8').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v10').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -490,7 +551,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v8').set(appState);
+                            db.ref('gqr_lab_v10').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -513,15 +574,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v8', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v8').set(appState);
+                localStorage.setItem('gqr_lab_v10', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v10').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v8');
+                const saved = localStorage.getItem('gqr_lab_v10');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -530,6 +591,20 @@
             const el = document.getElementById(id);
             el.classList.remove('hidden');
             el.classList.add('flex');
+            
+            if (id === 'modal-oven') {
+                const now = new Date();
+                if (!document.getElementById('in-oven-startdate').value) {
+                    document.getElementById('in-oven-startdate').value = now.toISOString().slice(0,10);
+                }
+                if (!document.getElementById('in-oven-starttime').value) {
+                    document.getElementById('in-oven-starttime').value = now.toTimeString().slice(0,5);
+                }
+                if (!document.getElementById('in-oven-duedate').value) {
+                    const due = new Date(now.getTime() + 48*3600*1000);
+                    document.getElementById('in-oven-duedate').value = due.toISOString().slice(0,10);
+                }
+            }
         }
 
         function closeModal(id) {
@@ -557,15 +632,12 @@
             renderLogbook();
         }
 
-        // --- MONITOR LIVE BIB IN CAMERA (COLORATO) ---
+        // --- MONITOR LIVE BIB IN CAMERA ---
         function renderLiveBibsInCamera() {
             const container = document.getElementById('live-bibs-container');
             if (!container) return;
 
-            // Trova le camere attualmente in run ("In Camera")
             const activeCameras = appState.ovens.filter(o => o.status === 'In Camera').map(o => o.name);
-            
-            // Trova le BIB mappate su queste camere attive
             const busyBibs = appState.mapping.filter(m => activeCameras.includes(m.cam));
 
             if (!busyBibs.length) {
@@ -573,7 +645,6 @@
                 return;
             }
 
-            // Colori vivaci a comparsa (pop-up badges) per identificazione immediata
             const colors = [
                 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
                 'bg-blue-500/20 text-blue-300 border-blue-500/40',
@@ -594,7 +665,7 @@
             }).join('');
         }
 
-        // --- DASHBOARD CAMERE ORDINATA ---
+        // --- DASHBOARD CAMERE ORDINATA & PULITA ---
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
@@ -632,34 +703,43 @@
                     ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' 
                     : 'bg-purple-500/20 text-purple-300 border-purple-500/40';
 
-                const actionBtnText = o.status === 'In Camera'
-                    ? '<i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Termina Step & Vai al Testing Elettrico'
-                    : '<i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera';
+                const actionBtn = o.status === 'In Camera'
+                    ? `<button onclick="openUnloadModal(${o.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center shadow"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Termina Step & Registra Fail</button>`
+                    : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center shadow"><i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera</button>`;
+
+                const imgButton = o.machineImage 
+                    ? `<button onclick="viewOvenImage(${o.id})" class="text-xs bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 px-2.5 py-1 rounded border border-blue-500/30 flex items-center gap-1"><i class="fa-solid fa-image"></i> Vedi Immagine</button>`
+                    : `<span class="text-[11px] text-slate-500 italic">Nessuna immagine</span>`;
 
                 return `
-                <div class="bg-slate-800 border ${!o.arelisSynced ? 'border-red-500/50' : (isDueToday ? 'border-amber-500 animate-pulse' : 'border-slate-700')} rounded-xl p-4 shadow-lg flex flex-col justify-between space-y-3">
-                    <div>
-                        <div class="flex justify-between items-start gap-2 mb-2">
-                            <h3 class="font-bold text-base text-cyan-400">${o.name}</h3>
-                            <div class="flex gap-1 items-center">
-                                ${isDueToday ? '<span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded text-xs font-bold">SCADE OGGI</span>' : ''}
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold border ${statusBadge}">${o.status}</span>
-                            </div>
+                <div class="bg-slate-800/90 border ${!o.arelisSynced ? 'border-red-500/50' : (isDueToday ? 'border-amber-500 animate-pulse' : 'border-slate-700/80')} rounded-xl p-4 shadow-xl flex flex-col justify-between space-y-3">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <h3 class="font-bold text-base text-cyan-400 flex items-center"><i class="fa-solid fa-door-closed mr-1.5 text-blue-400"></i>${o.name}</h3>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-semibold border ${statusBadge}">${o.status}</span>
                         </div>
-                        <p class="text-sm text-slate-200 mb-1"><i class="fa-solid fa-barcode mr-1.5 text-blue-400"></i><b>${o.lot}</b></p>
-                        <p class="text-xs text-slate-400 mb-2"><i class="fa-solid fa-temperature-high mr-1.5 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
-                        <p class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i> Scadenza: <b>${o.dueDate || 'N/D'}</b> &bull; Step: <b>+${o.stepHours}h</b> (Tot: ${o.accumulatedHours}h)</p>
+                        
+                        <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 space-y-1 text-xs">
+                            <p class="text-slate-100 flex items-center"><i class="fa-solid fa-barcode mr-2 text-blue-400"></i><b>${o.lot}</b></p>
+                            <p class="text-slate-300 flex items-center"><i class="fa-solid fa-temperature-high mr-2 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
+                            <p class="text-slate-400 flex items-center"><i class="fa-regular fa-clock mr-2 text-cyan-300"></i> Inizio: <b>${o.startDate || 'N/D'} ${o.startTime || ''}</b></p>
+                            <p class="text-slate-400 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-400 font-bold' : ''}">${o.dueDate || 'N/D'}</b> &bull; Step: <b>+${o.stepHours}h</b> (Tot: ${o.accumulatedHours}h)</p>
+                            <p class="text-slate-300 pt-1 border-t border-slate-800 flex items-center"><i class="fa-solid fa-microchip mr-2 text-cyan-400"></i> BIB: <b>${o.bibsList || 'N/D'}</b></p>
+                        </div>
                     </div>
 
-                    <div class="pt-2 border-t border-slate-700 space-y-2">
+                    <div class="space-y-2 pt-1">
+                        <div class="flex justify-between items-center bg-slate-900/40 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400">Report Macchina:</span>
+                            ${imgButton}
+                        </div>
+
                         <button onclick="toggleArelis(${o.id})" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'}">
                             <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
                             ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS'}
                         </button>
 
-                        <button onclick="advanceOvenFlow(${o.id})" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center">
-                            ${actionBtnText}
-                        </button>
+                        ${actionBtn}
 
                         <div class="flex justify-end pt-1">
                             <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-white px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina (Protetto)</button>
@@ -672,20 +752,69 @@
         function saveNewOven() {
             const name = document.getElementById('in-oven-name').value.trim();
             if (!name) return alert("Inserisci il nome della camera!");
-            appState.ovens.unshift({
-                id: Date.now(),
-                name,
-                lot: document.getElementById('in-oven-lot').value.trim() || 'N/D',
-                recipe: document.getElementById('in-oven-recipe').value.trim() || 'Standard',
-                temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
-                stepHours: parseInt(document.getElementById('in-oven-step').value) || 48,
-                accumulatedHours: 0,
-                dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0,10),
-                status: 'In Camera',
-                arelisSynced: document.getElementById('in-oven-arelis').checked
-            });
-            closeModal('modal-oven');
-            saveState();
+            
+            const lot = document.getElementById('in-oven-lot').value.trim() || 'N/D';
+            const recipe = document.getElementById('in-oven-recipe').value.trim() || 'Standard';
+            const rawBibs = document.getElementById('in-oven-bibs').value.trim();
+            const fileInput = document.getElementById('in-oven-file');
+
+            const createOvenObj = (imgBase64) => {
+                const newOven = {
+                    id: Date.now(),
+                    name,
+                    lot,
+                    recipe,
+                    temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
+                    stepHours: parseInt(document.getElementById('in-oven-step').value) || 48,
+                    accumulatedHours: 0,
+                    startDate: document.getElementById('in-oven-startdate').value || new Date().toISOString().slice(0,10),
+                    startTime: document.getElementById('in-oven-starttime').value || '08:00',
+                    dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0,10),
+                    status: 'In Camera',
+                    arelisSynced: document.getElementById('in-oven-arelis').checked,
+                    machineImage: imgBase64 || '',
+                    bibsList: rawBibs || 'N/D'
+                };
+
+                appState.ovens.unshift(newOven);
+
+                // Se sono state inserite le BIB, genera automaticamente anche il mapping unificato
+                if (rawBibs) {
+                    const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
+                    bibsArray.forEach(bib => {
+                        appState.mapping.push({
+                            id: Date.now() + Math.random(),
+                            cam: name,
+                            bib: bib.trim(),
+                            slot: 'Socket 1-32',
+                            dev: '32 pz',
+                            lot,
+                            rec: recipe
+                        });
+                    });
+                }
+
+                closeModal('modal-oven');
+                saveState();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    createOvenObj(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                createOvenObj('');
+            }
+        }
+
+        function viewOvenImage(id) {
+            const o = appState.ovens.find(x => x.id === id);
+            if (!o || !o.machineImage) return;
+            document.getElementById('img-modal-title').innerText = `Report Macchina - ${o.name} (${o.lot})`;
+            document.getElementById('modal-oven-img-preview').src = o.machineImage;
+            openModal('modal-view-image');
         }
 
         function toggleArelis(id) {
@@ -695,25 +824,50 @@
             saveState();
         }
 
+        function openUnloadModal(id) {
+            const o = appState.ovens.find(x => x.id === id);
+            if (!o) return;
+            document.getElementById('unload-oven-id').value = o.id;
+            document.getElementById('unload-info-text').innerHTML = `Camera: <b>${o.name}</b><br>Lotto: <b>${o.lot}</b><br>Completamento Step: <b>+${o.stepHours}h</b>`;
+            document.getElementById('in-unload-fails').value = 0;
+            document.getElementById('in-unload-notes').value = '';
+            openModal('modal-unload-fail');
+        }
+
+        function confirmUnloadWithFails() {
+            const id = parseInt(document.getElementById('unload-oven-id').value);
+            const o = appState.ovens.find(x => x.id === id);
+            if (!o) return;
+
+            const failsCount = document.getElementById('in-unload-fails').value || 0;
+            const failNotes = document.getElementById('in-unload-notes').value.trim();
+
+            o.accumulatedHours += o.stepHours;
+            o.status = 'Al Testing Elettrico';
+            o.arelisSynced = false;
+
+            appState.history.unshift({
+                date: new Date().toLocaleDateString('it-IT'),
+                name: o.name,
+                lot: o.lot,
+                recipe: `${o.temp} / ${o.recipe}`,
+                hours: `Completati +${o.stepHours}h (Tot: ${o.accumulatedHours}h)`,
+                fails: `${failsCount} Fail${failNotes ? ' - ' + failNotes : ''}`,
+                status: 'Inviato al Testing Elettrico'
+            });
+
+            closeModal('modal-unload-fail');
+            saveState();
+            alert("Prova scaricata correttamente e registrata nello storico con i dati sui fail!");
+        }
+
         function advanceOvenFlow(id) {
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
-            if (o.status === 'In Camera') {
-                o.accumulatedHours += o.stepHours;
-                o.status = 'Al Testing Elettrico';
-                o.arelisSynced = false;
-                appState.history.unshift({
-                    date: new Date().toLocaleDateString('it-IT'),
-                    name: o.name,
-                    lot: o.lot,
-                    recipe: `${o.temp} / ${o.recipe}`,
-                    hours: `Completati step +${o.stepHours}h (Tot: ${o.accumulatedHours}h)`,
-                    status: 'Inviato al Testing Elettrico'
-                });
-            } else {
-                o.status = 'In Camera';
-                o.arelisSynced = false;
-            }
+            o.status = 'In Camera';
+            o.arelisSynced = false;
+            o.startDate = new Date().toISOString().slice(0,10);
+            o.startTime = new Date().toTimeString().slice(0,5);
             saveState();
         }
 
@@ -781,7 +935,7 @@
                     <td class="p-3 font-semibold text-slate-200">${h.lot}</td>
                     <td class="p-3 text-amber-300">${h.recipe}</td>
                     <td class="p-3 text-slate-300">${h.hours}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-purple-500/20 text-purple-300">${h.status}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-amber-500/20 text-amber-300 font-semibold">${h.fails || 'N/D'}</span></td>
                 </tr>
             `).join('');
         }
@@ -1014,3 +1168,4 @@
     </script>
 </body>
 </html>
+
