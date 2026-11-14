@@ -21,18 +21,19 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-wide">GQR Reliability & Stress Lab</h1>
-                    <p class="text-xs text-slate-400">Board Mapping, Ciclo Prove & Controllo Arelis</p>
+                    <p class="text-xs text-slate-400">Camere, Cicli, Mapping & Controllo Arelis</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-full text-xs font-semibold">
+                <!-- Alert Arelis Ripristinato -->
+                <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span id="arelis-alert-count">0 da registrare su Arelis</span>
                 </div>
                 <div id="status-badge" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <span id="status-text">Inizializzazione...</span>
+                    <span id="status-text">Connessione...</span>
                 </div>
             </div>
         </div>
@@ -44,14 +45,17 @@
             <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow whitespace-nowrap">
                 <i class="fa-solid fa-layer-group mr-2"></i>Camere, Cicli & Arelis
             </button>
+            <button onclick="switchTab('history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+                <i class="fa-solid fa-clock-rotate-left mr-2"></i>Storico & Ricerca
+            </button>
             <button onclick="switchTab('mapping')" id="btn-tab-mapping" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
                 <i class="fa-solid fa-table-cells mr-2"></i>Mapping Rapido BIB
             </button>
             <button onclick="switchTab('inventory')" id="btn-tab-inventory" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
-                <i class="fa-solid fa-boxes-stacked mr-2"></i>Inventario BIB
+                <i class="fa-solid fa-boxes-stacked mr-2"></i>Inventario & Archivio
             </button>
             <button onclick="switchTab('maintenance')" id="btn-tab-maintenance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
-                <i class="fa-solid fa-wrench mr-2"></i>Manutenzione
+                <i class="fa-solid fa-wrench mr-2"></i>Ticket Manutentori
             </button>
             <button onclick="switchTab('logbook')" id="btn-tab-logbook" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
                 <i class="fa-solid fa-book-open mr-2"></i>Consegne Turno
@@ -66,40 +70,70 @@
         <section id="tab-ovens" class="tab-content space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Stato Camere, Rientri Testing & Arelis</h2>
-                    <p class="text-xs text-slate-400 mt-1">Tieni traccia delle ore accumulate tra i rientri dal testing e verifica cosa manca su Arelis.</p>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Stato Camere, Cicli & Controllo Arelis</h2>
+                    <p class="text-xs text-slate-400 mt-1">Traccia i carichi, i rientri dal testing e verifica di non dimenticare mai di loggare su Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Carico / Camera
+                    <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
+            <!-- Filtri rapidi Arelis / Scadenze -->
             <div class="flex flex-wrap gap-2 text-xs">
-                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">Tutti</button>
+                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">Tutti i Carichi</button>
                 <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-slate-800 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium">Da registrare su Arelis</button>
-                <button onclick="filterOvens('TESTING')" id="flt-TESTING" class="flt-btn bg-slate-800 text-purple-400 border border-purple-500/30 px-3 py-1.5 rounded-lg font-medium">Al Testing Elettrico</button>
+                <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-slate-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-medium">Pronti da scaricare oggi</button>
             </div>
 
             <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- TAB 2: MAPPING RAPIDO BIB -->
+        <!-- TAB 2: STORICO & RICERCA -->
+        <section id="tab-history" class="tab-content hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-400 mr-2"></i>Archivio Storico & Ricerca Prove</h2>
+                    <p class="text-xs text-slate-400 mt-1">Cerca qualsiasi prova passata o in corso per lotto, camera o ricetta.</p>
+                </div>
+                <div class="w-full md:w-72">
+                    <input id="search-history-input" type="text" oninput="renderHistory()" placeholder="Cerca lotto, camera..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500">
+                </div>
+            </div>
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 text-xs uppercase">
+                                <th class="p-3">Data</th>
+                                <th class="p-3">Camera</th>
+                                <th class="p-3">Lotto</th>
+                                <th class="p-3">Ricetta & Temp</th>
+                                <th class="p-3">Ore Accumulate</th>
+                                <th class="p-3">Stato</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MAPPING BIB -->
         <section id="tab-mapping" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Generatore Mapping BIB (Zero File Manuali)</h2>
-                    <p class="text-xs text-slate-400 mt-1">Compila le posizioni direttamente qui. Quando ti serve il file Excel pronto, clicca su Esporta.</p>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB (Zero File Manuali)</h2>
+                    <p class="text-xs text-slate-400 mt-1">Gestisci le posizioni slot e scarica il file ufficiale Excel con un click.</p>
                 </div>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex gap-2">
                     <button onclick="openModal('modal-mapping')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga Mapping
+                        <i class="fa-solid fa-plus mr-1"></i> Aggiungi Riga
                     </button>
-                    <button onclick="exportMappingFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                        <i class="fa-solid fa-file-excel mr-1"></i> Scarica Excel Mapping
+                    <button onclick="exportMappingFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-file-excel mr-1"></i> Esporta Excel
                     </button>
                 </div>
             </div>
-
             <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -107,11 +141,10 @@
                             <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 text-xs uppercase">
                                 <th class="p-3">Camera</th>
                                 <th class="p-3">ID BIB</th>
-                                <th class="p-3">Posizioni / Slot</th>
-                                <th class="p-3">Device / Pezzi</th>
+                                <th class="p-3">Slot</th>
+                                <th class="p-3">Device</th>
                                 <th class="p-3">Lotto</th>
-                                <th class="p-3">Temp & Ricetta</th>
-                                <th class="p-3">Inizio / Fine</th>
+                                <th class="p-3">Ricetta</th>
                                 <th class="p-3 text-right">Azioni</th>
                             </tr>
                         </thead>
@@ -121,17 +154,20 @@
             </div>
         </section>
 
-        <!-- TAB 3: INVENTARIO BIB -->
+        <!-- TAB 4: INVENTARIO & ARCHIVIO -->
         <section id="tab-inventory" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
-                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-500 mr-2"></i>Inventario Schede & BIB</h2>
+                <div>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-500 mr-2"></i>Inventario BIB & Spedizione Magazzino</h2>
+                    <p class="text-xs text-slate-400 mt-1">Seleziona le BIB pronte e mandale in archivio magazzino.</p>
+                </div>
                 <div class="flex gap-2">
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow cursor-pointer transition">
                         <i class="fa-solid fa-file-excel mr-1"></i> Importa Excel
                         <input type="file" id="excel-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcel(event)">
                     </label>
-                    <button onclick="exportExcel()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
-                        <i class="fa-solid fa-download mr-1"></i> Esporta
+                    <button onclick="archiveSelectedBibs()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <i class="fa-solid fa-box-archive mr-1"></i> Sposta in Archivio Magazzino
                     </button>
                 </div>
             </div>
@@ -140,6 +176,7 @@
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-slate-900/50 border-b border-slate-700 text-slate-400">
+                                <th class="p-3 w-10"><input type="checkbox" id="select-all-bib" onclick="toggleSelectAllBibs(this)"></th>
                                 <th class="p-3">Codice / BIB</th>
                                 <th class="p-3">Lotto</th>
                                 <th class="p-3">Quantità</th>
@@ -151,28 +188,55 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Archivio Magazzino -->
+            <div class="mt-8 space-y-3">
+                <h3 class="text-base font-bold text-slate-300 flex items-center"><i class="fa-solid fa-warehouse mr-2 text-purple-400"></i>Archivio BIB Pronti per Magazzino</h3>
+                <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-900/40 border-b border-slate-700 text-slate-400 text-xs">
+                                    <th class="p-3">BIB / Codice</th>
+                                    <th class="p-3">Lotto</th>
+                                    <th class="p-3">Quantità</th>
+                                    <th class="p-3">Data Archiviazione</th>
+                                    <th class="p-3 text-right">Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archive-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- TAB 4: MANUTENZIONE -->
+        <!-- TAB 5: TICKET MANUTENZIONE -->
         <section id="tab-maintenance" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-wrench text-amber-500 mr-2"></i>Ticket Manutenzione</h2>
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-wrench text-amber-500 mr-2"></i>Segnalazione Guasti ai Manutentori</h2>
+                    <p class="text-xs text-slate-400 mt-1">Invia la segnalazione direttamente via email al team manutenzione.</p>
+                </div>
                 <button onclick="openModal('modal-ticket')" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Ticket
+                    <i class="fa-solid fa-plus mr-1"></i> Nuovo Ticket Guasto
                 </button>
             </div>
             <div id="maintenance-list" class="space-y-3"></div>
         </section>
 
-        <!-- TAB 5: LOGBOOK TURNI -->
+        <!-- TAB 6: LOGBOOK TURNI -->
         <section id="tab-logbook" class="tab-content hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-book-open text-purple-500 mr-2"></i>Passaggio Consegne Turno</h2>
+                <div>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-book-open text-purple-500 mr-2"></i>Passaggio Consegne Turno</h2>
+                    <p class="text-xs text-slate-400 mt-1">Registro consegne giornaliere per turno Mattina e Pomeriggio.</p>
+                </div>
                 <button onclick="openModal('modal-log')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-pen-to-square mr-1"></i> Scrivi Nota Turno
                 </button>
             </div>
-            <div id="logbook-list" class="space-y-3"></div>
+            <div id="logbook-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
     </main>
@@ -209,8 +273,8 @@
                         <input id="in-oven-step" type="number" value="120" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Target Totale</label>
-                        <input id="in-oven-target" type="number" value="1000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs text-slate-400 mb-1">Scadenza (Data)</label>
+                        <input id="in-oven-duedate" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 pt-1">
@@ -225,52 +289,59 @@
         </div>
     </div>
 
+    <!-- MODALE MODIFICA PROTETTA DA PASSWORD -->
+    <div id="modal-edit-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-amber-400"><i class="fa-solid fa-lock mr-2"></i>Modifica Protetta (Password)</h3>
+                <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <input type="hidden" id="edit-oven-id">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Password Lab (gqr123)</label>
+                    <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Nuovo Lotto</label>
+                    <input id="edit-oven-lot" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Step Ore</label>
+                        <input id="edit-oven-step" type="number" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Data Scadenza</label>
+                        <input id="edit-oven-due" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
+                <button onclick="closeModal('modal-edit-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
+                <button onclick="confirmEditOven()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium">Salva Modifiche</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-mapping" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-cyan-400">Nuova Riga Mapping BIB</h3>
+                <h3 class="font-bold text-lg text-cyan-400">Nuova Riga Mapping</h3>
                 <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Camera</label>
-                        <input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">ID BIB / Board</label>
-                        <input id="in-map-bib" type="text" placeholder="BIB-014" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Camera</label><input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs text-slate-400 mb-1">ID BIB</label><input id="in-map-bib" type="text" placeholder="BIB-014" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Posizioni / Slot</label>
-                        <input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Codice Device / Pezzi</label>
-                        <input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Slot</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Device</label><input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Lotto</label>
-                        <input id="in-map-lot" type="text" placeholder="CHROMITEM M02B" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Temp & Ricetta</label>
-                        <input id="in-map-rec" type="text" placeholder="125°C / HTOL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Inizio Prova</label>
-                        <input id="in-map-start" type="text" placeholder="14/11 08:00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Fine Prevista</label>
-                        <input id="in-map-end" type="text" placeholder="19/11 08:00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Lotto</label><input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs text-slate-400 mb-1">Ricetta</label><input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
@@ -283,26 +354,29 @@
     <div id="modal-ticket" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-amber-400">Nuovo Ticket Manutenzione</h3>
+                <h3 class="font-bold text-lg text-amber-400">Segnala Guasto ai Manutentori</h3>
                 <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Macchina / Camera e Problema</label>
-                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Allarme" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs text-slate-400 mb-1">Email Manutenzione Destinataria</label>
+                    <input id="in-tkt-email" type="email" value="manutenzione@gqr-lab.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Descrizione Guasto / Macchina</label>
+                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Errore temperatura" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Priorità</label>
                     <select id="in-tkt-prio" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <option value="Alta">Alta (Macchina ferma)</option>
+                        <option value="Alta">Alta (Macchina Ferma)</option>
                         <option value="Media" selected>Media</option>
-                        <option value="Bassa">Bassa</option>
                     </select>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-ticket')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewTicket()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium">Apri Ticket</button>
+                <button onclick="sendMaintenanceEmail()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium"><i class="fa-solid fa-paper-plane mr-1"></i> Invia a Manutentori</button>
             </div>
         </div>
     </div>
@@ -324,7 +398,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Operatore</label>
-                        <input id="in-log-author" type="text" placeholder="Il tuo nome" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="in-log-author" type="text" placeholder="Nome operatore" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                 </div>
                 <div>
@@ -334,13 +408,15 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-log')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 font-medium">Pubblica</button>
+                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 font-medium">Pubblica Nota</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATIVO ROBUSTO -->
+    <!-- SCRIPT APPLICATIVO -->
     <script>
+        const LAB_PASSWORD = "gqr123"; // Password per sbloccare le modifiche alle prove in corso
+
         const firebaseConfig = {
             apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
             authDomain: "gqr-lab-db.firebaseapp.com",
@@ -358,20 +434,17 @@
 
         let appState = {
             ovens: [
-                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B - M03A', recipe: 'HTOL_125', temp: '125°C', stepHours: 120, accumulatedHours: 0, targetHours: 1000, status: 'In Camera', arelisSynced: false },
-                { id: 2, name: 'Forno HAST 02', lot: 'LOT-9822', recipe: 'HAST_130', temp: '130°C', stepHours: 96, accumulatedHours: 96, targetHours: 96, status: 'Al Testing Elettrico', arelisSynced: true }
+                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 120, accumulatedHours: 0, dueDate: new Date().toISOString().slice(0,10), arelisSynced: false, historySteps: [] }
             ],
-            mapping: [
-                { id: 1, cam: 'DM24 ch1', bib: 'BIB-012', slot: 'Socket 1-32', dev: '32 pz - CHROMITEM M02B', lot: 'CHROMITEM M02B', rec: '125°C / HTOL_125', start: '14/11 08:00', end: '19/11 08:00' }
-            ],
+            history: [],
+            mapping: [],
             inventory: [
-                { code: 'BIB-012', lot: 'CHROMITEM M02B', qty: 32, rack: 'Rack A - Ripiano 1', status: 'In Camera' }
+                { code: 'BIB-012', lot: 'CHROMITEM M02B', qty: 32, rack: 'Rack A - 1', status: 'Disponibile' }
             ],
-            maintenance: [
-                { id: 1, title: 'Calibrazione sensore umidità HAST', date: '14/11/2026', status: 'Aperto', priority: 'Alta' }
-            ],
+            archive: [],
+            maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Operatore Lab', date: '14/11/2026 13:50', text: 'Caricato DM24 ch1 (120h). Da registrare su Arelis.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Sistema operativo sincronizzato e pronto.' }
             ]
         };
 
@@ -379,53 +452,35 @@
             try {
                 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
                     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-                    
-                    // Forziamo esplicitamente l'URL europeo per evitare blocchi in attesa
                     db = firebase.database(undefined, firebaseConfig.databaseURL);
                     
                     let connected = false;
                     const safetyTimer = setTimeout(() => {
-                        if (!connected) {
-                            console.warn("Timeout connessione cloud: passaggio a modalità locale.");
-                            updateStatus(false);
-                            loadLocal();
-                            renderAll();
-                        }
+                        if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v3').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v5').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
                         if (val) {
                             appState = {
                                 ovens: val.ovens || [],
+                                history: val.history || [],
                                 mapping: val.mapping || [],
                                 inventory: val.inventory || [],
+                                archive: val.archive || [],
                                 maintenance: val.maintenance || [],
                                 logbook: val.logbook || []
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v3').set(appState);
+                            db.ref('gqr_lab_v5').set(appState);
                         }
                         updateStatus(true);
-                    }, (error) => {
-                        clearTimeout(safetyTimer);
-                        updateStatus(false);
-                        loadLocal();
-                        renderAll();
-                    });
-                } else {
-                    updateStatus(false);
-                    loadLocal();
-                    renderAll();
-                }
-            } catch (e) {
-                updateStatus(false);
-                loadLocal();
-                renderAll();
-            }
+                    }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
+                } else { updateStatus(false); loadLocal(); renderAll(); }
+            } catch (e) { updateStatus(false); loadLocal(); renderAll(); }
         }
 
         function updateStatus(active) {
@@ -437,21 +492,21 @@
                 text.innerText = "Cloud Live";
             } else {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                text.innerText = "Modalità Locale";
+                text.innerText = "Offline";
             }
         }
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v3', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v3').set(appState);
+                localStorage.setItem('gqr_lab_v5', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v5').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v3');
+                const saved = localStorage.getItem('gqr_lab_v5');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -479,12 +534,14 @@
 
         function renderAll() {
             renderOvens();
+            renderHistory();
             renderMapping();
             renderInventory();
             renderMaintenance();
             renderLogbook();
         }
 
+        // --- DASHBOARD CAMERE & CONTROLLO ARELIS ---
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
@@ -493,12 +550,15 @@
         }
 
         function renderOvens() {
-            const pendingCount = appState.ovens.filter(o => !o.arelisSynced).length;
+            const todayStr = new Date().toISOString().slice(0,10);
+            
+            // Gestione alert Arelis in alto
+            const pendingArelis = appState.ovens.filter(o => !o.arelisSynced).length;
             const alertBadge = document.getElementById('arelis-alert-badge');
-            if (pendingCount > 0) {
+            if (pendingArelis > 0) {
                 alertBadge.classList.remove('hidden');
                 alertBadge.classList.add('flex');
-                document.getElementById('arelis-alert-count').innerText = `${pendingCount} da loggare su Arelis`;
+                document.getElementById('arelis-alert-count').innerText = `${pendingArelis} da registrare su Arelis`;
             } else {
                 alertBadge.classList.add('hidden');
                 alertBadge.classList.remove('flex');
@@ -506,61 +566,40 @@
 
             let list = appState.ovens;
             if (currentFilter === 'ARELIS_PENDING') list = list.filter(o => !o.arelisSynced);
-            if (currentFilter === 'TESTING') list = list.filter(o => o.status === 'Al Testing Elettrico');
+            if (currentFilter === 'DUE_TODAY') list = list.filter(o => o.dueDate === todayStr);
 
             const container = document.getElementById('ovens-grid');
             if (!list.length) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-sm">Nessuna prova in questa vista.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-sm">Nessuna camera in questa vista.</div>`;
                 return;
             }
 
             container.innerHTML = list.map(o => {
-                const statusBadge = o.status === 'In Camera'
-                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                    : (o.status === 'Al Testing Elettrico'
-                        ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                        : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30');
-
-                const nextBtnLabel = o.status === 'In Camera'
-                    ? '<i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Scarica e Manda al Testing'
-                    : (o.status === 'Al Testing Elettrico'
-                        ? '<i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera'
-                        : '<i class="fa-solid fa-play mr-1"></i> Riavvia');
-
+                const isDueToday = o.dueDate === todayStr;
                 return `
-                <div class="bg-slate-800 border ${!o.arelisSynced ? 'border-red-500/50' : 'border-slate-700'} rounded-xl p-4 shadow-lg flex flex-col justify-between space-y-3">
+                <div class="bg-slate-800 border ${!o.arelisSynced ? 'border-red-500/50' : (isDueToday ? 'border-amber-500 animate-pulse' : 'border-slate-700')} rounded-xl p-4 shadow-lg flex flex-col justify-between space-y-3">
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h3 class="font-bold text-base text-cyan-400">${o.name}</h3>
-                            <span class="px-2.5 py-0.5 rounded text-xs font-semibold border ${statusBadge}">${o.status}</span>
+                            <div class="flex gap-1">
+                                ${isDueToday ? '<span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded text-xs font-bold">SCADE OGGI</span>' : ''}
+                            </div>
                         </div>
                         <p class="text-sm text-slate-200 mb-1"><i class="fa-solid fa-barcode mr-1.5 text-blue-400"></i><b>${o.lot}</b></p>
                         <p class="text-xs text-slate-400 mb-2"><i class="fa-solid fa-temperature-high mr-1.5 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
-                        
-                        <div class="bg-slate-900/70 rounded-lg p-2.5 border border-slate-700/70 text-xs space-y-1">
-                            <div class="flex justify-between text-slate-300">
-                                <span>Step: <b>+${o.stepHours}h</b></span>
-                                <span>Accumulate: <b>${o.accumulatedHours} / ${o.targetHours}h</b></span>
-                            </div>
-                            <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                <div class="bg-blue-500 h-full" style="width: ${Math.min(100, Math.round((o.accumulatedHours / (o.targetHours || 1)) * 100))}%"></div>
-                            </div>
-                        </div>
+                        <p class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i> Scadenza: <b>${o.dueDate || 'N/D'}</b> &bull; Step: <b>+${o.stepHours}h</b> (Tot: ${o.accumulatedHours}h)</p>
                     </div>
 
                     <div class="pt-2 border-t border-slate-700 space-y-2">
+                        <!-- Spunta Arelis Ripristinata -->
                         <button onclick="toggleArelis(${o.id})" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'}">
                             <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
                             ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS (Clicca)'}
                         </button>
 
                         <div class="flex gap-2">
-                            <button onclick="cycleOvenFlow(${o.id})" class="flex-grow bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-2.5 rounded-lg text-xs font-medium transition">
-                                ${nextBtnLabel}
-                            </button>
-                            <button onclick="deleteOven(${o.id})" title="Rimuovi" class="bg-slate-700/60 hover:bg-red-600/30 text-red-400 px-2.5 rounded-lg text-xs transition">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <button onclick="openEditOven(${o.id})" class="flex-grow bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-2 rounded-lg text-xs font-medium"><i class="fa-solid fa-lock mr-1"></i> Modifica (Pwd)</button>
+                            <button onclick="completeOvenStep(${o.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium"><i class="fa-solid fa-check mr-1"></i> Scarica</button>
                         </div>
                     </div>
                 </div>`;
@@ -569,7 +608,7 @@
 
         function saveNewOven() {
             const name = document.getElementById('in-oven-name').value.trim();
-            if (!name) return alert("Inserisci il nome!");
+            if (!name) return alert("Inserisci il nome della camera!");
             appState.ovens.unshift({
                 id: Date.now(),
                 name,
@@ -578,9 +617,9 @@
                 temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
                 stepHours: parseInt(document.getElementById('in-oven-step').value) || 120,
                 accumulatedHours: 0,
-                targetHours: parseInt(document.getElementById('in-oven-target').value) || 1000,
-                status: 'In Camera',
-                arelisSynced: document.getElementById('in-oven-arelis').checked
+                dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0,10),
+                arelisSynced: document.getElementById('in-oven-arelis').checked,
+                historySteps: []
             });
             closeModal('modal-oven');
             saveState();
@@ -593,31 +632,85 @@
             saveState();
         }
 
-        function cycleOvenFlow(id) {
+        function openEditOven(id) {
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
-            if (o.status === 'In Camera') {
-                o.accumulatedHours = (o.accumulatedHours || 0) + (o.stepHours || 0);
-                o.status = 'Al Testing Elettrico';
-                o.arelisSynced = false;
-            } else {
-                o.status = 'In Camera';
-                o.arelisSynced = false;
-            }
-            saveState();
+            document.getElementById('edit-oven-id').value = o.id;
+            document.getElementById('edit-oven-lot').value = o.lot;
+            document.getElementById('edit-oven-step').value = o.stepHours;
+            document.getElementById('edit-oven-due').value = o.dueDate;
+            document.getElementById('edit-oven-pwd').value = '';
+            openModal('modal-edit-oven');
         }
 
-        function deleteOven(id) {
-            if (confirm("Eliminare questa scheda?")) {
-                appState.ovens = appState.ovens.filter(x => x.id !== id);
+        function confirmEditOven() {
+            const pwd = document.getElementById('edit-oven-pwd').value;
+            if (pwd !== LAB_PASSWORD) {
+                alert("Password errata! Impossibile modificare la prova in corso.");
+                return;
+            }
+            const id = parseInt(document.getElementById('edit-oven-id').value);
+            const o = appState.ovens.find(x => x.id === id);
+            if (o) {
+                o.lot = document.getElementById('edit-oven-lot').value.trim();
+                o.stepHours = parseInt(document.getElementById('edit-oven-step').value) || o.stepHours;
+                o.dueDate = document.getElementById('edit-oven-due').value;
+                o.arelisSynced = false; // Modifica richiede riverifica su Arelis
+                closeModal('modal-edit-oven');
                 saveState();
+                alert("Modifiche salvate con successo!");
             }
         }
 
+        function completeOvenStep(id) {
+            const o = appState.ovens.find(x => x.id === id);
+            if (!o) return;
+            o.accumulatedHours += o.stepHours;
+            
+            appState.history.unshift({
+                date: new Date().toLocaleDateString('it-IT'),
+                name: o.name,
+                lot: o.lot,
+                recipe: `${o.temp} / ${o.recipe}`,
+                hours: `${o.accumulatedHours}h (Ultimo step: +${o.stepHours}h)`,
+                status: 'Scaricato / Test Elettrico'
+            });
+
+            appState.ovens = appState.ovens.filter(x => x.id !== id);
+            saveState();
+            alert("Prova scaricata e registrata nello storico!");
+        }
+
+        // --- STORICO & RICERCA ---
+        function renderHistory() {
+            const query = (document.getElementById('search-history-input')?.value || '').toLowerCase();
+            const tbody = document.getElementById('history-table-body');
+            const filtered = appState.history.filter(h => 
+                h.lot.toLowerCase().includes(query) || h.name.toLowerCase().includes(query) || h.recipe.toLowerCase().includes(query)
+            );
+
+            if (!filtered.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Nessun record trovato nello storico.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(h => `
+                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
+                    <td class="p-3 text-slate-400">${h.date}</td>
+                    <td class="p-3 font-bold text-blue-400">${h.name}</td>
+                    <td class="p-3 font-semibold text-slate-200">${h.lot}</td>
+                    <td class="p-3 text-amber-300">${h.recipe}</td>
+                    <td class="p-3 text-slate-300">${h.hours}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400">${h.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- MAPPING BIB ---
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
             if (!appState.mapping.length) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">Nessuna riga di mapping.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">Nessuna riga di mapping.</td></tr>`;
                 return;
             }
             tbody.innerHTML = appState.mapping.map(m => `
@@ -628,17 +721,14 @@
                     <td class="p-3 text-slate-200">${m.dev}</td>
                     <td class="p-3 text-slate-300">${m.lot}</td>
                     <td class="p-3 text-amber-300">${m.rec}</td>
-                    <td class="p-3 text-slate-400">${m.start} ➔ ${m.end}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deleteMapping(${m.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+                    <td class="p-3 text-right"><button onclick="deleteMapping(${m.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
 
         function saveNewMapping() {
             const bib = document.getElementById('in-map-bib').value.trim();
-            if (!bib) return alert("Inserisci l'ID BIB!");
+            if (!bib) return alert("Inserisci ID BIB!");
             appState.mapping.push({
                 id: Date.now(),
                 cam: document.getElementById('in-map-cam').value.trim() || 'N/D',
@@ -646,9 +736,7 @@
                 slot: document.getElementById('in-map-slot').value.trim() || 'Tutti',
                 dev: document.getElementById('in-map-dev').value.trim() || 'N/D',
                 lot: document.getElementById('in-map-lot').value.trim() || 'N/D',
-                rec: document.getElementById('in-map-rec').value.trim() || 'N/D',
-                start: document.getElementById('in-map-start').value.trim() || 'N/D',
-                end: document.getElementById('in-map-end').value.trim() || 'N/D'
+                rec: document.getElementById('in-map-rec').value.trim() || 'N/D'
             });
             closeModal('modal-mapping');
             saveState();
@@ -661,26 +749,68 @@
 
         function exportMappingFile() {
             if (!appState.mapping.length) return alert("Nessun dato.");
-            const formatted = appState.mapping.map(m => ({
-                "Camera": m.cam, "ID BIB": m.bib, "Slot": m.slot, "Device": m.dev, "Lotto": m.lot, "Ricetta": m.rec, "Inizio": m.start, "Fine": m.end
-            }));
-            const ws = XLSX.utils.json_to_sheet(formatted);
+            const ws = XLSX.utils.json_to_sheet(appState.mapping);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Mapping BIB");
+            XLSX.utils.book_append_sheet(wb, ws, "Mapping");
             XLSX.writeFile(wb, "GQR_Mapping.xlsx");
         }
 
+        // --- INVENTARIO & ARCHIVIO ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
-            tbody.innerHTML = appState.inventory.map(i => `
-                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+            tbody.innerHTML = appState.inventory.map((i, idx) => `
+                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
+                    <td class="p-3"><input type="checkbox" class="bib-checkbox accent-blue-500" data-index="${idx}"></td>
                     <td class="p-3 font-medium">${i.code}</td>
                     <td class="p-3 text-slate-300">${i.lot}</td>
                     <td class="p-3 text-slate-300">${i.qty}</td>
                     <td class="p-3 text-slate-300">${i.rack}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-400">${i.status}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">${i.status}</span></td>
                 </tr>
             `).join('');
+
+            const archBody = document.getElementById('archive-table-body');
+            if (!appState.archive.length) {
+                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 text-xs">Nessuna BIB in archivio magazzino.</td></tr>`;
+            } else {
+                archBody.innerHTML = appState.archive.map(a => `
+                    <tr class="border-b border-slate-700/50 text-xs">
+                        <td class="p-3 font-semibold text-purple-300">${a.code}</td>
+                        <td class="p-3 text-slate-300">${a.lot}</td>
+                        <td class="p-3 text-slate-300">${a.qty}</td>
+                        <td class="p-3 text-slate-400">${a.date}</td>
+                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">Ripristina</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function toggleSelectAllBibs(master) {
+            document.querySelectorAll('.bib-checkbox').forEach(cb => cb.checked = master.checked);
+        }
+
+        function archiveSelectedBibs() {
+            const checkedBoxes = document.querySelectorAll('.bib-checkbox:checked');
+            if (!checkedBoxes.length) return alert("Seleziona almeno una BIB.");
+            
+            const indices = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.index));
+            const items = indices.map(idx => appState.inventory[idx]);
+
+            items.forEach(item => {
+                appState.archive.unshift({ ...item, id: Date.now() + Math.random(), date: new Date().toLocaleDateString('it-IT') });
+            });
+
+            appState.inventory = appState.inventory.filter((_, idx) => !indices.includes(idx));
+            saveState();
+            alert("BIB spostate in archivio magazzino!");
+        }
+
+        function restoreArchive(id) {
+            const item = appState.archive.find(x => x.id === id);
+            if (!item) return;
+            appState.inventory.push({ code: item.code, lot: item.lot, qty: item.qty, rack: item.rack, status: 'Disponibile' });
+            appState.archive = appState.archive.filter(x => x.id !== id);
+            saveState();
         }
 
         function importExcel(e) {
@@ -693,63 +823,50 @@
                     const workbook = XLSX.read(data, {type: 'array'});
                     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                     if (rows.length > 0) {
-                        appState.inventory = rows.map(r => {
-                            const keys = Object.keys(r);
-                            const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
-                            return {
-                                code: getVal(['codice', 'code', 'bib', 'id bib']) || r[keys[0]] || 'N/D',
-                                lot: getVal(['lotto', 'lot']) || (keys[1] ? r[keys[1]] : 'N/D'),
-                                qty: getVal(['quantita', 'quantità', 'qty']) || (keys[2] ? r[keys[2]] : 0),
-                                rack: getVal(['rack', 'posizione']) || (keys[3] ? r[keys[3]] : 'N/D'),
-                                status: getVal(['stato', 'status']) || 'Disponibile'
-                            };
-                        });
+                        appState.inventory = rows.map(r => ({
+                            code: r.Codice || r.code || 'BIB-000',
+                            lot: r.Lotto || r.lot || 'N/D',
+                            qty: r.Quantita || r.qty || 0,
+                            rack: r.Rack || r.rack || 'N/D',
+                            status: 'Disponibile'
+                        }));
                         saveState();
-                        alert("Importato con successo!");
+                        alert("Inventario importato!");
                     }
-                } catch(err) { alert("Errore Excel."); }
+                } catch(err) { alert("Errore file Excel."); }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function exportExcel() {
-            const ws = XLSX.utils.json_to_sheet(appState.inventory);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Inventario BIB");
-            XLSX.writeFile(wb, "GQR_Inventario.xlsx");
-        }
-
+        // --- TICKET MANUTENZIONE ---
         function renderMaintenance() {
             const container = document.getElementById('maintenance-list');
+            if (!appState.maintenance.length) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">Nessun ticket di guasto attivo.</div>`;
+                return;
+            }
             container.innerHTML = appState.maintenance.map(m => `
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center gap-3 shadow">
                     <div>
                         <h4 class="font-bold text-sm text-slate-200">${m.title}</h4>
-                        <p class="text-xs text-slate-400 mt-1">${m.date} &bull; Priorità: <b>${m.priority}</b> &bull; Stato: <b class="${m.status === 'Chiuso' ? 'text-emerald-400' : 'text-amber-400'}">${m.status}</b></p>
+                        <p class="text-xs text-slate-400 mt-1">${m.date} &bull; Destinatario: <b>${m.email}</b> &bull; Priorità: <span class="text-red-400">${m.priority}</span></p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="toggleTicket(${m.id})" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded">Stato</button>
-                        <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-600/20 text-red-400 px-2.5 py-1.5 rounded"><i class="fa-solid fa-trash"></i></button>
-                    </div>
+                    <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-600/20 text-red-400 px-3 py-1.5 rounded">Risolto</button>
                 </div>
             `).join('');
         }
 
-        function saveNewTicket() {
+        function sendMaintenanceEmail() {
+            const email = document.getElementById('in-tkt-email').value.trim();
             const title = document.getElementById('in-tkt-title').value.trim();
-            if (!title) return;
-            appState.maintenance.unshift({
-                id: Date.now(), title, date: new Date().toLocaleDateString('it-IT'), status: 'Aperto', priority: document.getElementById('in-tkt-prio').value
-            });
-            closeModal('modal-ticket');
-            saveState();
-        }
+            const prio = document.getElementById('in-tkt-prio').value;
+            if (!title) return alert("Inserisci la descrizione!");
 
-        function toggleTicket(id) {
-            const t = appState.maintenance.find(x => x.id === id);
-            if (!t) return;
-            t.status = t.status === 'Aperto' ? 'In Lavorazione' : (t.status === 'In Lavorazione' ? 'Chiuso' : 'Aperto');
+            appState.maintenance.unshift({ id: Date.now(), title, email, priority: prio, date: new Date().toLocaleString('it-IT') });
             saveState();
+            closeModal('modal-ticket');
+
+            window.location.href = `mailto:${email}?subject=SEGNALAZIONE GUASTO LAB - Priorità ${prio}&body=Guasto segnalato:%0D%0A${encodeURIComponent(title)}`;
         }
 
         function deleteTicket(id) {
@@ -757,18 +874,20 @@
             saveState();
         }
 
+        // --- LOGBOOK TURNI ---
         function renderLogbook() {
             const container = document.getElementById('logbook-list');
             container.innerHTML = appState.logbook.map(l => `
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow">
-                    <div class="flex justify-between items-center mb-1">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded text-xs font-bold ${l.shift.startsWith('Mattina') ? 'bg-blue-500/20 text-blue-400' : 'bg-purple-500/20 text-purple-400'}">${l.shift}</span>
-                            <span class="text-xs font-semibold text-slate-300">${l.author}</span>
-                        </div>
-                        <span class="text-xs text-slate-500">${l.date}</span>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-xl flex flex-col justify-between space-y-3">
+                    <div class="flex justify-between items-start">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${l.shift.startsWith('Mattina') ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'}">${l.shift}</span>
+                        <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${l.date}</span>
                     </div>
-                    <p class="text-sm text-slate-200 mt-2">${l.text}</p>
+                    <p class="text-sm text-slate-100 leading-relaxed">${l.text}</p>
+                    <div class="pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
+                        <span>Operatore: <b class="text-slate-200">${l.author}</b></span>
+                        <i class="fa-solid fa-circle-check text-emerald-400"> Consegnato</i>
+                    </div>
                 </div>
             `).join('');
         }
@@ -792,3 +911,4 @@
     </script>
 </body>
 </html>
+
