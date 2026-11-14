@@ -44,6 +44,9 @@
             <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow whitespace-nowrap">
                 <i class="fa-solid fa-layer-group mr-2"></i>Camere & Flusso Prove
             </button>
+            <button onclick="switchTab('planner')" id="btn-tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+                <i class="fa-solid fa-envelope-open-text mr-2"></i>Planner & Email
+            </button>
             <button onclick="switchTab('history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
                 <i class="fa-solid fa-clock-rotate-left mr-2"></i>Storico & Ricerca
             </button>
@@ -70,11 +73,36 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
                 <div>
                     <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Gestione ordinata dei carichi, mapping allegato, immagini macchina e controllo Arelis.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Gestione carichi, Trial ID, Label, mapping e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
+            </div>
+
+            <!-- PANORAMICA GIORNALIERA (IN PARTENZA, IN SCARICO, MANCANTI DA TESTING) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-800/90 border border-blue-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">In Partenza / Oggi</p>
+                        <h4 id="count-departing" class="text-lg font-bold text-blue-400 mt-0.5">0 Prove</h4>
+                    </div>
+                    <div class="bg-blue-500/20 p-2.5 rounded-lg text-blue-300"><i class="fa-solid fa-plane-departure text-base"></i></div>
+                </div>
+                <div class="bg-slate-800/90 border border-amber-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">In Scarico / Scadono Oggi</p>
+                        <h4 id="count-unloading" class="text-lg font-bold text-amber-400 mt-0.5">0 Prove</h4>
+                    </div>
+                    <div class="bg-amber-500/20 p-2.5 rounded-lg text-amber-300"><i class="fa-solid fa-box-open text-base"></i></div>
+                </div>
+                <div class="bg-slate-800/90 border border-red-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Mancanti da Testing (Non Consegnate)</p>
+                        <h4 id="count-missing" class="text-lg font-bold text-red-400 mt-0.5">0 Segnalate</h4>
+                    </div>
+                    <div class="bg-red-500/20 p-2.5 rounded-lg text-red-300"><i class="fa-solid fa-triangle-exclamation text-base"></i></div>
+                </div>
             </div>
 
             <!-- MONITOR LIVE BIB IN CAMERA -->
@@ -98,7 +126,22 @@
             <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- TAB 2: STORICO & RICERCA -->
+        <!-- TAB 2: PLANNER & EMAIL -->
+        <section id="tab-planner" class="tab-content hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-envelope-open-text text-indigo-400 mr-2"></i>Email & Planning dei Planner (Turno Mattina)</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Incolla qui la tabella o il testo ricevuto via email dai Planner per preparare il lavoro del giorno dopo.</p>
+                </div>
+                <button onclick="openModal('modal-planner')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Incolla / Aggiungi Planning
+                </button>
+            </div>
+
+            <div id="planner-list" class="space-y-4"></div>
+        </section>
+
+        <!-- TAB 3: STORICO & RICERCA -->
         <section id="tab-history" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
@@ -116,7 +159,7 @@
                             <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 text-xs uppercase">
                                 <th class="p-3">Data</th>
                                 <th class="p-3">Camera</th>
-                                <th class="p-3">Lotto</th>
+                                <th class="p-3">Lotto / Trial ID</th>
                                 <th class="p-3">Ricetta & Temp</th>
                                 <th class="p-3">Ore Accumulate</th>
                                 <th class="p-3">Fail / Esito</th>
@@ -128,7 +171,7 @@
             </div>
         </section>
 
-        <!-- TAB 3: MAPPING BIB -->
+        <!-- TAB 4: MAPPING BIB -->
         <section id="tab-mapping" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
@@ -164,7 +207,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: INVENTARIO & ARCHIVIO -->
+        <!-- TAB 5: INVENTARIO & ARCHIVIO -->
         <section id="tab-inventory" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
@@ -221,7 +264,7 @@
             </div>
         </section>
 
-        <!-- TAB 5: TICKET MANUTENZIONE -->
+        <!-- TAB 6: TICKET MANUTENZIONE -->
         <section id="tab-maintenance" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
@@ -235,7 +278,7 @@
             <div id="maintenance-list" class="space-y-3"></div>
         </section>
 
-        <!-- TAB 6: LOGBOOK TURNI -->
+        <!-- TAB 7: LOGBOOK TURNI -->
         <section id="tab-logbook" class="tab-content hidden space-y-6">
             <div class="flex justify-between items-center">
                 <div>
@@ -252,11 +295,11 @@
     </main>
 
     <!-- MODALI -->
-    <!-- MODALE CARICO PROVA CON MAPPING E IMMAGINE MACCHINA -->
+    <!-- MODALE CARICO PROVA CON TRIAL ID, LABEL, CHECK FUSE E GUANTI -->
     <div id="modal-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-blue-400">Carico Camera & Associazione Mapping/Immagine</h3>
+                <h3 class="font-bold text-lg text-blue-400">Carico Camera & Dati Prova (Trial ID / Label)</h3>
                 <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
@@ -270,8 +313,18 @@
                         <input id="in-oven-lot" type="text" placeholder="CHROMITEM M02B" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Ricetta Macchina</label>
-                        <input id="in-oven-recipe" type="text" placeholder="HTOL_125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs text-slate-400 mb-1">Trial ID</label>
+                        <input id="in-oven-trial" type="text" placeholder="es. TR-2026-99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-cyan-300">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Ricetta Macchina (es. uhast, tc, hts...)</label>
+                        <input id="in-oven-recipe" type="text" placeholder="uhast_130" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Label / Etichetta (per uhast, tc, hts)</label>
+                        <input id="in-oven-label" type="text" placeholder="Etichetta specifica..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -290,7 +343,7 @@
                         <input id="in-oven-temp" type="text" value="125°C" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Step Ore (es. 48)</label>
+                        <label class="block text-xs text-slate-400 mb-1">Step Ore</label>
                         <input id="in-oven-step" type="number" value="48" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
@@ -299,11 +352,11 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">BIB Coinvolte nella Prova (es. BIB-014, BIB-015, BIB-016...)</label>
-                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB qui per generare subito il mapping..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                    <label class="block text-xs text-slate-400 mb-1">BIB Coinvolte (es. BIB-014, BIB-015...)</label>
+                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Allega Immagine / Report Macchina (Screenshot)</label>
+                    <label class="block text-xs text-slate-400 mb-1">Allega Immagine / Report Macchina</label>
                     <input id="in-oven-file" type="file" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
                 </div>
                 <div class="flex items-center space-x-2 pt-1">
@@ -313,7 +366,38 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
                 <button onclick="closeModal('modal-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-blue-600 hover:bg-blue-500 font-medium">Salva Carico & Allega</button>
+                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-blue-600 hover:bg-blue-500 font-medium">Salva Carico & Verifica Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE INCOLLA PLANNING EMAIL PLANNER -->
+    <div id="modal-planner" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-indigo-400"><i class="fa-solid fa-paste mr-2"></i>Incolla Planning Email Planner</h3>
+                <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Titolo / Riferimento Giorno (es. Planning Lunedì)</label>
+                    <input id="in-plan-title" type="text" placeholder="Planning Turno Domani" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Incolla qui la tabella o il testo ricevuto via email</label>
+                    <textarea id="in-plan-text" rows="6" placeholder="Incolla l'email dei planner con le prove da preparare..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Stato Arrivo dal Testing</label>
+                    <select id="in-plan-status" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <option value="In Arrivo / Previsto">In Arrivo / Previsto</option>
+                        <option value="Mancante / Testing Non Consegnato" class="text-red-400">⚠️ Mancante (Testing non ha consegnato)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
+                <button onclick="closeModal('modal-planner')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
+                <button onclick="saveNewPlannerPlan()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 font-medium">Salva Planning</button>
             </div>
         </div>
     </div>
@@ -512,7 +596,10 @@
 
         let appState = {
             ovens: [
-                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 48, accumulatedHours: 0, startDate: new Date().toISOString().slice(0,10), startTime: '08:00', dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false, machineImage: '', bibsList: 'BIB-012, BIB-013' }
+                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', trialId: 'TR-2026-01', recipe: 'tc_125', label: 'LBL-A', temp: '125°C', stepHours: 48, accumulatedHours: 0, startDate: new Date().toISOString().slice(0,10), startTime: '08:00', dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false, machineImage: '', bibsList: 'BIB-012, BIB-013' }
+            ],
+            plannerEmails: [
+                { id: 1, title: 'Planning di Esempio (Domani)', date: '14/11/2026', text: 'Camera DM24 ch1 - Lotto CHROMITEM - Trial TR-01', status: 'In Arrivo / Previsto' }
             ],
             history: [],
             mapping: [],
@@ -520,7 +607,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Dashboard pulita, allegato immagini e mapping unificato.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Planning email, trial ID, etichette e alert guanti/fuse integrati.' }
             ]
         };
 
@@ -535,13 +622,14 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v10').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v11').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
                         if (val) {
                             appState = {
                                 ovens: val.ovens || [],
+                                plannerEmails: val.plannerEmails || [],
                                 history: val.history || [],
                                 mapping: val.mapping || [],
                                 inventory: val.inventory || [],
@@ -551,7 +639,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v10').set(appState);
+                            db.ref('gqr_lab_v11').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -574,15 +662,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v10', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v10').set(appState);
+                localStorage.setItem('gqr_lab_v11', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v11').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v10');
+                const saved = localStorage.getItem('gqr_lab_v11');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -623,13 +711,32 @@
         }
 
         function renderAll() {
+            renderSummaryCounters();
             renderLiveBibsInCamera();
             renderOvens();
+            renderPlannerEmails();
             renderHistory();
             renderMapping();
             renderInventory();
             renderMaintenance();
             renderLogbook();
+        }
+
+        // --- COUNTERS PANORAMICA GIORNALIERA ---
+        function renderSummaryCounters() {
+            const todayStr = new Date().toISOString().slice(0,10);
+            
+            // In partenza / oggi
+            const departing = appState.ovens.filter(o => o.startDate === todayStr || o.status === 'In Camera').length;
+            document.getElementById('count-departing').innerText = `${departing} Prove`;
+
+            // In scarico (scadono oggi)
+            const unloading = appState.ovens.filter(o => o.dueDate === todayStr).length;
+            document.getElementById('count-unloading').innerText = `${unloading} Prove`;
+
+            // Mancanti da testing (segnalati nel planning email come mancanti)
+            const missing = (appState.plannerEmails || []).filter(p => p.status && p.status.includes('Mancante')).length;
+            document.getElementById('count-missing').innerText = `${missing} Segnalate`;
         }
 
         // --- MONITOR LIVE BIB IN CAMERA ---
@@ -663,6 +770,62 @@
                     <span class="bg-slate-900/60 px-1.5 py-0.5 rounded text-[10px] text-slate-300 ml-1">Lotto: ${b.lot}</span>
                 </div>`;
             }).join('');
+        }
+
+        // --- PLANNER & EMAIL LIST ---
+        function renderPlannerEmails() {
+            const container = document.getElementById('planner-list');
+            if (!container) return;
+            const list = appState.plannerEmails || [];
+
+            if (!list.length) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm bg-slate-800 rounded-xl border border-slate-700">Nessun planning email inserito. Incolla il planning dei planner per il turno di mattina.</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(p => {
+                const isMissing = p.status && p.status.includes('Mancante');
+                return `
+                <div class="bg-slate-800 border ${isMissing ? 'border-red-500/60' : 'border-slate-700'} rounded-xl p-4 shadow-lg space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm text-indigo-300 flex items-center"><i class="fa-solid fa-envelope mr-2"></i>${p.title}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Salvato il: ${p.date}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded text-xs font-bold border ${isMissing ? 'bg-red-500/20 text-red-300 border-red-500/40 animate-pulse' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}">${p.status}</span>
+                            <button onclick="deletePlannerPlan(${p.id})" class="text-xs text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/60 text-xs font-mono text-slate-200 whitespace-pre-wrap">${p.text}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function saveNewPlannerPlan() {
+            const title = document.getElementById('in-plan-title').value.trim() || 'Planning Email Planner';
+            const text = document.getElementById('in-plan-text').value.trim();
+            const status = document.getElementById('in-plan-status').value;
+
+            if (!text) return alert("Inserisci il testo della email dei planner!");
+
+            appState.plannerEmails.unshift({
+                id: Date.now(),
+                title,
+                date: new Date().toLocaleString('it-IT'),
+                text,
+                status
+            });
+
+            document.getElementById('in-plan-text').value = '';
+            document.getElementById('in-plan-title').value = '';
+            closeModal('modal-planner');
+            saveState();
+        }
+
+        function deletePlannerPlan(id) {
+            appState.plannerEmails = appState.plannerEmails.filter(x => x.id !== id);
+            saveState();
         }
 
         // --- DASHBOARD CAMERE ORDINATA & PULITA ---
@@ -720,8 +883,12 @@
                         </div>
                         
                         <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 space-y-1 text-xs">
-                            <p class="text-slate-100 flex items-center"><i class="fa-solid fa-barcode mr-2 text-blue-400"></i><b>${o.lot}</b></p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-slate-100 flex items-center"><i class="fa-solid fa-barcode mr-2 text-blue-400"></i><b>${o.lot}</b></p>
+                                ${o.trialId ? `<span class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-mono text-[10px] border border-cyan-500/30">Trial: ${o.trialId}</span>` : ''}
+                            </div>
                             <p class="text-slate-300 flex items-center"><i class="fa-solid fa-temperature-high mr-2 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
+                            ${o.label ? `<p class="text-amber-300 flex items-center"><i class="fa-solid fa-tag mr-2"></i> Label: <b>${o.label}</b></p>` : ''}
                             <p class="text-slate-400 flex items-center"><i class="fa-regular fa-clock mr-2 text-cyan-300"></i> Inizio: <b>${o.startDate || 'N/D'} ${o.startTime || ''}</b></p>
                             <p class="text-slate-400 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-400 font-bold' : ''}">${o.dueDate || 'N/D'}</b> &bull; Step: <b>+${o.stepHours}h</b> (Tot: ${o.accumulatedHours}h)</p>
                             <p class="text-slate-300 pt-1 border-t border-slate-800 flex items-center"><i class="fa-solid fa-microchip mr-2 text-cyan-400"></i> BIB: <b>${o.bibsList || 'N/D'}</b></p>
@@ -754,16 +921,30 @@
             if (!name) return alert("Inserisci il nome della camera!");
             
             const lot = document.getElementById('in-oven-lot').value.trim() || 'N/D';
+            const trialId = document.getElementById('in-oven-trial').value.trim() || '';
             const recipe = document.getElementById('in-oven-recipe').value.trim() || 'Standard';
+            const label = document.getElementById('in-oven-label').value.trim() || '';
             const rawBibs = document.getElementById('in-oven-bibs').value.trim();
             const fileInput = document.getElementById('in-oven-file');
+
+            // --- ALERT POP-UP RICHIESTI ---
+            // 1. Check Fuse obbligatorio ad ogni avvio
+            alert("⚡ PROMEMORIA CHECK FUSE: Assicurati di aver effettuato il controllo dei fusibili prima di avviare la prova!");
+
+            // 2. Controllo ricetta per guanti in TC o BHAST
+            const recipeLower = recipe.toLowerCase();
+            if (recipeLower.includes('tc') || recipeLower.includes('bhast')) {
+                alert("🛡️ PROTOCOLLO SICUREZZA BIB: Per test TC o BHAST, ricorda di indossare i guanti per caricare i pezzi nelle BIB!");
+            }
 
             const createOvenObj = (imgBase64) => {
                 const newOven = {
                     id: Date.now(),
                     name,
                     lot,
+                    trialId,
                     recipe,
+                    label,
                     temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
                     stepHours: parseInt(document.getElementById('in-oven-step').value) || 48,
                     accumulatedHours: 0,
@@ -778,7 +959,6 @@
 
                 appState.ovens.unshift(newOven);
 
-                // Se sono state inserite le BIB, genera automaticamente anche il mapping unificato
                 if (rawBibs) {
                     const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
                     bibsArray.forEach(bib => {
@@ -828,7 +1008,7 @@
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
             document.getElementById('unload-oven-id').value = o.id;
-            document.getElementById('unload-info-text').innerHTML = `Camera: <b>${o.name}</b><br>Lotto: <b>${o.lot}</b><br>Completamento Step: <b>+${o.stepHours}h</b>`;
+            document.getElementById('unload-info-text').innerHTML = `Camera: <b>${o.name}</b><br>Lotto: <b>${o.lot}</b> ${o.trialId ? '(Trial: ' + o.trialId + ')' : ''}<br>Completamento Step: <b>+${o.stepHours}h</b>`;
             document.getElementById('in-unload-fails').value = 0;
             document.getElementById('in-unload-notes').value = '';
             openModal('modal-unload-fail');
@@ -849,7 +1029,7 @@
             appState.history.unshift({
                 date: new Date().toLocaleDateString('it-IT'),
                 name: o.name,
-                lot: o.lot,
+                lot: `${o.lot} ${o.trialId ? '[Trial: ' + o.trialId + ']' : ''}`,
                 recipe: `${o.temp} / ${o.recipe}`,
                 hours: `Completati +${o.stepHours}h (Tot: ${o.accumulatedHours}h)`,
                 fails: `${failsCount} Fail${failNotes ? ' - ' + failNotes : ''}`,
