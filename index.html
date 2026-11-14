@@ -26,7 +26,6 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <!-- Alert Arelis Ripristinato -->
                 <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span id="arelis-alert-count">0 da registrare su Arelis</span>
@@ -70,19 +69,19 @@
         <section id="tab-ovens" class="tab-content space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Stato Camere, Cicli & Controllo Arelis</h2>
-                    <p class="text-xs text-slate-400 mt-1">Traccia i carichi, i rientri dal testing e verifica di non dimenticare mai di loggare su Arelis.</p>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Stato Camere & Flusso Prove</h2>
+                    <p class="text-xs text-slate-400 mt-1">Gestione ordinata dei carichi, passaggi al testing elettrico e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
-            <!-- Filtri rapidi Arelis / Scadenze -->
+            <!-- Filtri rapidi -->
             <div class="flex flex-wrap gap-2 text-xs">
                 <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">Tutti i Carichi</button>
                 <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-slate-800 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium">Da registrare su Arelis</button>
-                <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-slate-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-medium">Pronti da scaricare oggi</button>
+                <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-slate-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-medium">Scade Oggi</button>
             </div>
 
             <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -122,7 +121,7 @@
         <section id="tab-mapping" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB (Zero File Manuali)</h2>
+                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB</h2>
                     <p class="text-xs text-slate-400 mt-1">Gestisci le posizioni slot e scarica il file ufficiale Excel con un click.</p>
                 </div>
                 <div class="flex gap-2">
@@ -269,8 +268,8 @@
                         <input id="in-oven-temp" type="text" value="125°C" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Step Ore</label>
-                        <input id="in-oven-step" type="number" value="120" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs text-slate-400 mb-1">Step Ore (es. 48)</label>
+                        <input id="in-oven-step" type="number" value="48" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Scadenza (Data)</label>
@@ -289,17 +288,18 @@
         </div>
     </div>
 
-    <!-- MODALE MODIFICA PROTETTA DA PASSWORD -->
+    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD (MASCHERATA) -->
     <div id="modal-edit-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-amber-400"><i class="fa-solid fa-lock mr-2"></i>Modifica Protetta (Password)</h3>
+                <h3 class="font-bold text-lg text-amber-400"><i class="fa-solid fa-lock mr-2"></i>Gestione Protetta (Password)</h3>
                 <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <input type="hidden" id="edit-oven-id">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Password Lab (gqr123)</label>
+                    <label class="block text-xs text-slate-400 mb-1">Password Lab</label>
+                    <!-- type="password" nasconde i caratteri con i pallini neri -->
                     <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                 </div>
                 <div>
@@ -317,9 +317,12 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-edit-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="confirmEditOven()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium">Salva Modifiche</button>
+            <div class="flex justify-between items-center pt-3 border-t border-slate-700">
+                <button onclick="confirmDeleteOven()" class="px-3 py-2 rounded-lg text-xs bg-red-600/20 text-red-400 hover:bg-red-600/30"><i class="fa-solid fa-trash mr-1"></i> Elimina Prova</button>
+                <div class="flex gap-2">
+                    <button onclick="closeModal('modal-edit-oven')" class="px-3 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
+                    <button onclick="confirmEditOven()" class="px-3 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium">Salva Modifiche</button>
+                </div>
             </div>
         </div>
     </div>
@@ -415,7 +418,7 @@
 
     <!-- SCRIPT APPLICATIVO -->
     <script>
-        const LAB_PASSWORD = "gqr123"; // Password per sbloccare le modifiche alle prove in corso
+        const LAB_PASSWORD = "gqr123"; // Password per sbloccare modifiche ed eliminazioni
 
         const firebaseConfig = {
             apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
@@ -434,17 +437,15 @@
 
         let appState = {
             ovens: [
-                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 120, accumulatedHours: 0, dueDate: new Date().toISOString().slice(0,10), arelisSynced: false, historySteps: [] }
+                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', recipe: 'HTOL_125', temp: '125°C', stepHours: 48, accumulatedHours: 0, dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false }
             ],
             history: [],
             mapping: [],
-            inventory: [
-                { code: 'BIB-012', lot: 'CHROMITEM M02B', qty: 32, rack: 'Rack A - 1', status: 'Disponibile' }
-            ],
+            inventory: [],
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Sistema operativo sincronizzato e pronto.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Sistema aggiornato con flusso cicli e parser Excel corretto.' }
             ]
         };
 
@@ -459,7 +460,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v5').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v6').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -475,7 +476,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v5').set(appState);
+                            db.ref('gqr_lab_v6').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -498,15 +499,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v5', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v5').set(appState);
+                localStorage.setItem('gqr_lab_v6', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v6').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v5');
+                const saved = localStorage.getItem('gqr_lab_v6');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -541,7 +542,7 @@
             renderLogbook();
         }
 
-        // --- DASHBOARD CAMERE & CONTROLLO ARELIS ---
+        // --- DASHBOARD CAMERE ORDINATA & GESTIONE CICLI ---
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
@@ -552,7 +553,6 @@
         function renderOvens() {
             const todayStr = new Date().toISOString().slice(0,10);
             
-            // Gestione alert Arelis in alto
             const pendingArelis = appState.ovens.filter(o => !o.arelisSynced).length;
             const alertBadge = document.getElementById('arelis-alert-badge');
             if (pendingArelis > 0) {
@@ -570,19 +570,28 @@
 
             const container = document.getElementById('ovens-grid');
             if (!list.length) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-sm">Nessuna camera in questa vista.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-sm">Nessuna prova in questa vista.</div>`;
                 return;
             }
 
             container.innerHTML = list.map(o => {
                 const isDueToday = o.dueDate === todayStr;
+                const statusBadge = o.status === 'In Camera' 
+                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' 
+                    : 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+
+                const actionBtnText = o.status === 'In Camera'
+                    ? '<i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Termina Step & Vai al Testing Elettrico'
+                    : '<i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera';
+
                 return `
                 <div class="bg-slate-800 border ${!o.arelisSynced ? 'border-red-500/50' : (isDueToday ? 'border-amber-500 animate-pulse' : 'border-slate-700')} rounded-xl p-4 shadow-lg flex flex-col justify-between space-y-3">
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h3 class="font-bold text-base text-cyan-400">${o.name}</h3>
-                            <div class="flex gap-1">
+                            <div class="flex gap-1 items-center">
                                 ${isDueToday ? '<span class="bg-amber-500 text-slate-950 px-2 py-0.5 rounded text-xs font-bold">SCADE OGGI</span>' : ''}
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold border ${statusBadge}">${o.status}</span>
                             </div>
                         </div>
                         <p class="text-sm text-slate-200 mb-1"><i class="fa-solid fa-barcode mr-1.5 text-blue-400"></i><b>${o.lot}</b></p>
@@ -591,15 +600,17 @@
                     </div>
 
                     <div class="pt-2 border-t border-slate-700 space-y-2">
-                        <!-- Spunta Arelis Ripristinata -->
                         <button onclick="toggleArelis(${o.id})" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'}">
                             <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
-                            ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS (Clicca)'}
+                            ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS'}
                         </button>
 
-                        <div class="flex gap-2">
-                            <button onclick="openEditOven(${o.id})" class="flex-grow bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-2 rounded-lg text-xs font-medium"><i class="fa-solid fa-lock mr-1"></i> Modifica (Pwd)</button>
-                            <button onclick="completeOvenStep(${o.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium"><i class="fa-solid fa-check mr-1"></i> Scarica</button>
+                        <button onclick="advanceOvenFlow(${o.id})" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center">
+                            ${actionBtnText}
+                        </button>
+
+                        <div class="flex justify-end pt-1">
+                            <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-white px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina (Protetto)</button>
                         </div>
                     </div>
                 </div>`;
@@ -615,11 +626,11 @@
                 lot: document.getElementById('in-oven-lot').value.trim() || 'N/D',
                 recipe: document.getElementById('in-oven-recipe').value.trim() || 'Standard',
                 temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
-                stepHours: parseInt(document.getElementById('in-oven-step').value) || 120,
+                stepHours: parseInt(document.getElementById('in-oven-step').value) || 48,
                 accumulatedHours: 0,
                 dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0,10),
-                arelisSynced: document.getElementById('in-oven-arelis').checked,
-                historySteps: []
+                status: 'In Camera',
+                arelisSynced: document.getElementById('in-oven-arelis').checked
             });
             closeModal('modal-oven');
             saveState();
@@ -629,6 +640,28 @@
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
             o.arelisSynced = !o.arelisSynced;
+            saveState();
+        }
+
+        function advanceOvenFlow(id) {
+            const o = appState.ovens.find(x => x.id === id);
+            if (!o) return;
+            if (o.status === 'In Camera') {
+                o.accumulatedHours += o.stepHours;
+                o.status = 'Al Testing Elettrico';
+                o.arelisSynced = false; // Richiede verifica su Arelis per il passaggio al testing
+                appState.history.unshift({
+                    date: new Date().toLocaleDateString('it-IT'),
+                    name: o.name,
+                    lot: o.lot,
+                    recipe: `${o.temp} / ${o.recipe}`,
+                    hours: `Completati step +${o.stepHours}h (Tot: ${o.accumulatedHours}h)`,
+                    status: 'Inviato al Testing Elettrico'
+                });
+            } else {
+                o.status = 'In Camera';
+                o.arelisSynced = false; // Richiede verifica su Arelis per il rientro
+            }
             saveState();
         }
 
@@ -646,7 +679,7 @@
         function confirmEditOven() {
             const pwd = document.getElementById('edit-oven-pwd').value;
             if (pwd !== LAB_PASSWORD) {
-                alert("Password errata! Impossibile modificare la prova in corso.");
+                alert("Password errata!");
                 return;
             }
             const id = parseInt(document.getElementById('edit-oven-id').value);
@@ -655,30 +688,25 @@
                 o.lot = document.getElementById('edit-oven-lot').value.trim();
                 o.stepHours = parseInt(document.getElementById('edit-oven-step').value) || o.stepHours;
                 o.dueDate = document.getElementById('edit-oven-due').value;
-                o.arelisSynced = false; // Modifica richiede riverifica su Arelis
+                o.arelisSynced = false;
                 closeModal('modal-edit-oven');
                 saveState();
-                alert("Modifiche salvate con successo!");
+                alert("Modifiche salvate!");
             }
         }
 
-        function completeOvenStep(id) {
-            const o = appState.ovens.find(x => x.id === id);
-            if (!o) return;
-            o.accumulatedHours += o.stepHours;
-            
-            appState.history.unshift({
-                date: new Date().toLocaleDateString('it-IT'),
-                name: o.name,
-                lot: o.lot,
-                recipe: `${o.temp} / ${o.recipe}`,
-                hours: `${o.accumulatedHours}h (Ultimo step: +${o.stepHours}h)`,
-                status: 'Scaricato / Test Elettrico'
-            });
-
-            appState.ovens = appState.ovens.filter(x => x.id !== id);
-            saveState();
-            alert("Prova scaricata e registrata nello storico!");
+        function confirmDeleteOven() {
+            const pwd = document.getElementById('edit-oven-pwd').value;
+            if (pwd !== LAB_PASSWORD) {
+                alert("Password errata! Impossibile eliminare la prova.");
+                return;
+            }
+            if (confirm("Vuoi davvero eliminare questa prova?")) {
+                const id = parseInt(document.getElementById('edit-oven-id').value);
+                appState.ovens = appState.ovens.filter(x => x.id !== id);
+                closeModal('modal-edit-oven');
+                saveState();
+            }
         }
 
         // --- STORICO & RICERCA ---
@@ -701,7 +729,7 @@
                     <td class="p-3 font-semibold text-slate-200">${h.lot}</td>
                     <td class="p-3 text-amber-300">${h.recipe}</td>
                     <td class="p-3 text-slate-300">${h.hours}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400">${h.status}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-purple-500/20 text-purple-300">${h.status}</span></td>
                 </tr>
             `).join('');
         }
@@ -755,19 +783,23 @@
             XLSX.writeFile(wb, "GQR_Mapping.xlsx");
         }
 
-        // --- INVENTARIO & ARCHIVIO ---
+        // --- INVENTARIO & ARCHIVIO (CON PARSER EXCEL CORRETTO) ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
-            tbody.innerHTML = appState.inventory.map((i, idx) => `
-                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
-                    <td class="p-3"><input type="checkbox" class="bib-checkbox accent-blue-500" data-index="${idx}"></td>
-                    <td class="p-3 font-medium">${i.code}</td>
-                    <td class="p-3 text-slate-300">${i.lot}</td>
-                    <td class="p-3 text-slate-300">${i.qty}</td>
-                    <td class="p-3 text-slate-300">${i.rack}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">${i.status}</span></td>
-                </tr>
-            `).join('');
+            if (!appState.inventory.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 text-xs">Nessun elemento in inventario. Importa un file Excel.</td></tr>`;
+            } else {
+                tbody.innerHTML = appState.inventory.map((i, idx) => `
+                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
+                        <td class="p-3"><input type="checkbox" class="bib-checkbox accent-blue-500" data-index="${idx}"></td>
+                        <td class="p-3 font-medium">${i.code}</td>
+                        <td class="p-3 text-slate-300">${i.lot}</td>
+                        <td class="p-3 text-slate-300">${i.qty}</td>
+                        <td class="p-3 text-slate-300">${i.rack}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">${i.status}</span></td>
+                    </tr>
+                `).join('');
+            }
 
             const archBody = document.getElementById('archive-table-body');
             if (!appState.archive.length) {
@@ -821,19 +853,25 @@
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
-                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: "N/D"});
+                    
                     if (rows.length > 0) {
-                        appState.inventory = rows.map(r => ({
-                            code: r.Codice || r.code || 'BIB-000',
-                            lot: r.Lotto || r.lot || 'N/D',
-                            qty: r.Quantita || r.qty || 0,
-                            rack: r.Rack || r.rack || 'N/D',
-                            status: 'Disponibile'
-                        }));
+                        appState.inventory = rows.map(r => {
+                            const keys = Object.keys(r);
+                            const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
+                            return {
+                                code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'BIB-001',
+                                lot: getVal(['lotto', 'lot']) || (keys[1] ? r[keys[1]] : 'N/D'),
+                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || (keys[2] ? r[keys[2]] : 0),
+                                rack: getVal(['rack', 'posizione', 'pos']) || (keys[3] ? r[keys[3]] : 'N/D'),
+                                status: 'Disponibile'
+                            };
+                        }).filter(i => i.code && i.code !== 'BIB-000');
+                        
                         saveState();
-                        alert("Inventario importato!");
+                        alert("Inventario importato correttamente!");
                     }
-                } catch(err) { alert("Errore file Excel."); }
+                } catch(err) { alert("Errore durante l'importazione del file Excel."); }
             };
             reader.readAsArrayBuffer(file);
         }
@@ -911,4 +949,3 @@
     </script>
 </body>
 </html>
-
