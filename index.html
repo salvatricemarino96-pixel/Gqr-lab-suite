@@ -73,6 +73,9 @@
             <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-sky-600 text-white shadow whitespace-nowrap">
                 <i class="fa-solid fa-layer-group mr-2"></i>Camere & Flusso Prove
             </button>
+            <button onclick="switchTab('digitaltwin')" id="btn-tab-digitaltwin" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
+                <i class="fa-solid fa-map-location-dot mr-2"></i>Digital Twin Reparto
+            </button>
             <button onclick="switchTab('planner')" id="btn-tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-envelope-open-text mr-2"></i>Planner & Email
             </button>
@@ -102,22 +105,11 @@
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
                     <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-layer-group text-sky-600 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Digital Twin interattivo, Trial ID e controllo Arelis.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Trial ID, Label, countdown e controllo Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
-            </div>
-
-            <!-- NOVITÀ 1: DIGITAL TWIN - MAPPA INTERATTIVA DELLE CAMERE -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center">
-                        <i class="fa-solid fa-map-location-dot text-sky-600 mr-2"></i>Digital Twin: Mappa Interattiva Reparto Camere
-                    </h3>
-                    <span class="text-xs text-slate-400">Clicca su una camera per filtri rapidi</span>
-                </div>
-                <div id="digital-twin-map" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"></div>
             </div>
 
             <!-- PANORAMICA GIORNALIERA -->
@@ -170,6 +162,18 @@
             </div>
 
             <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- TAB DIGITAL TWIN DEDICATA -->
+        <section id="tab-digitaltwin" class="tab-content hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-map-location-dot text-sky-600 mr-2"></i>Digital Twin: Reparto Camere & Multi-Prova</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Mappa interattiva delle macchine. Clicca su una camera per visualizzare e gestire tutte le prove simultanee in corso.</p>
+                </div>
+            </div>
+
+            <div id="digital-twin-map" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
         </section>
 
         <!-- TAB 2: PLANNER & EMAIL -->
@@ -341,7 +345,24 @@
     </main>
 
     <!-- MODALI -->
-    <!-- MODALE CARICO PROVA CON DETTATURA VOCALE -->
+    <!-- MODALE DETTAGLIO MULTI-PROVA CAMERA (DIGITAL TWIN) -->
+    <div id="modal-chamber-detail" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 id="chamber-detail-title" class="font-bold text-lg text-sky-700 flex items-center">
+                    <i class="fa-solid fa-door-closed mr-2"></i>Dettaglio Postazione
+                </h3>
+                <button onclick="closeModal('modal-chamber-detail')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">Elenco di tutte le prove attualmente in corso o caricate in questa camera:</p>
+            <div id="chamber-detail-list" class="space-y-3"></div>
+            <div class="flex justify-end pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-chamber-detail')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE CARICO PROVA CON DETTATURA VOCALE CORRETTA -->
     <div id="modal-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
@@ -351,7 +372,7 @@
                 <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <!-- NOVITÀ 2: PULSANTE MICROFONO PER DETTATURA VOCALE -->
+            <!-- PULSANTE MICROFONO PER DETTATURA VOCALE -->
             <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <div class="bg-sky-600 text-white p-2 rounded-lg"><i class="fa-solid fa-microphone"></i></div>
@@ -434,7 +455,7 @@
         </div>
     </div>
 
-    <!-- NOVITÀ 3: MODALE PARSER EMAIL PLANNER -->
+    <!-- MODALE PARSER EMAIL PLANNER -->
     <div id="modal-planner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
@@ -471,7 +492,6 @@
                 <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Dettaglio Prova & QR Code</h3>
                 <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <!-- NOVITÀ 4: QR CODE GENERATOR BOX -->
             <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                 <div id="qrcode-container" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200"></div>
                 <p class="text-xs text-slate-500 text-center">Inquadra questo QR Code con il telefono per richiamare subito la prova.</p>
@@ -674,7 +694,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin, Dettatura Vocale e Parser Email integrati con successo.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Digital Twin in tab dedicata e gestione multi-prova per camera attivi.' }
             ]
         };
 
@@ -713,7 +733,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v14').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v15').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -730,7 +750,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v14').set(appState);
+                            db.ref('gqr_lab_v15').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -753,15 +773,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v14', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v14').set(appState);
+                localStorage.setItem('gqr_lab_v15', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v15').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v14');
+                const saved = localStorage.getItem('gqr_lab_v15');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -814,7 +834,7 @@
             renderLogbook();
         }
 
-        // --- NOVITÀ 1: DIGITAL TWIN MAPPA INTERATTIVA ---
+        // --- DIGITAL TWIN MAPPA INTERATTIVA (MULTI-PROVA PER CAMERA) ---
         function renderDigitalTwinMap() {
             const container = document.getElementById('digital-twin-map');
             if (!container) return;
@@ -822,36 +842,75 @@
             const standardCameras = ['DM24 ch1', 'DM24 ch2', 'uHAST 1', 'uHAST 2', 'TC Chamber', 'HTS Lab'];
             
             container.innerHTML = standardCameras.map(camName => {
-                const activeOven = appState.ovens.find(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
-                const isBusy = !!activeOven;
+                // Trova TUTTE le prove attive (In Camera) per questa specifica postazione
+                const chamberOvens = appState.ovens.filter(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
+                const activeCount = chamberOvens.length;
                 
-                const bgClass = isBusy ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-400';
-                const statusDotColor = isBusy ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300';
+                const bgClass = activeCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-sm' : 'bg-white border-slate-200 text-slate-500';
+                const statusDotColor = activeCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300';
                 
+                let previewHtml = `<p class="text-[11px] text-slate-400 italic">Nessuna prova attiva</p>`;
+                if (activeCount > 0) {
+                    previewHtml = `
+                        <div class="space-y-1 mt-1">
+                            <span class="inline-block bg-sky-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${activeCount} Prova/e in corso</span>
+                            <p class="text-[11px] font-semibold text-slate-700 truncate">Lotto: ${chamberOvens[0].lot}</p>
+                            ${chamberOvens[0].trialId ? `<p class="text-[10px] font-mono text-sky-700 truncate">Trial: ${chamberOvens[0].trialId}</p>` : ''}
+                        </div>
+                    `;
+                }
+
                 return `
-                <div onclick="filterByCamera('${camName}')" class="border rounded-xl p-3 flex flex-col justify-between space-y-2 cursor-pointer transition transform hover:scale-105 ${bgClass}">
+                <div onclick="openChamberDetailModal('${camName}')" class="border rounded-2xl p-4 flex flex-col justify-between space-y-3 cursor-pointer transition transform hover:scale-[1.02] shadow-sm ${bgClass}">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold truncate">${camName}</span>
-                        <span class="w-2.5 h-2.5 rounded-full ${statusDotColor}"></span>
+                        <span class="text-sm font-bold text-slate-800 flex items-center"><i class="fa-solid fa-temperature-high mr-1.5 text-sky-600"></i>${camName}</span>
+                        <span class="w-3 h-3 rounded-full ${statusDotColor}"></span>
                     </div>
                     <div>
-                        <p class="text-[10px] ${isBusy ? 'text-sky-700 font-semibold' : 'text-slate-400'} truncate">
-                            ${isBusy ? activeOven.lot : 'Disponibile'}
-                        </p>
-                        <p class="text-[9px] text-slate-400 truncate">
-                            ${isBusy ? (activeOven.trialId || activeOven.recipe) : 'Libera'}
-                        </p>
+                        ${previewHtml}
+                    </div>
+                    <div class="pt-2 border-t border-slate-200/60 flex justify-between items-center text-[11px] text-sky-600 font-semibold">
+                        <span>Gestisci / Vedi tutte</span>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function filterByCamera(camName) {
-            document.getElementById('search-ovens-input').value = camName;
-            renderOvens();
+        // Apre il modale con l'elenco completo di tutte le prove attive in quella camera
+        function openChamberDetailModal(camName) {
+            document.getElementById('chamber-detail-title').innerHTML = `<i class="fa-solid fa-door-closed mr-2 text-sky-600"></i>Postazione: ${camName}`;
+            const listContainer = document.getElementById('chamber-detail-list');
+            
+            const chamberOvens = appState.ovens.filter(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
+
+            if (!chamberOvens.length) {
+                listContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">Nessuna prova attualmente in corso in questa postazione. Puoi caricarne una nuova dalla dashboard principale.</div>`;
+            } else {
+                listContainer.innerHTML = chamberOvens.map((o, idx) => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-800 text-sm">#${idx + 1} - Lotto: ${o.lot}</span>
+                            ${o.trialId ? `<span class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-sky-200">Trial: ${o.trialId}</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-600">
+                            <div>Ricetta: <b class="text-slate-800">${o.recipe}</b></div>
+                            <div>Temperatura: <b class="text-slate-800">${o.temp}</b></div>
+                            <div>Scadenza: <b class="text-slate-800">${o.dueDate}</b></div>
+                            <div>BIB: <b class="text-slate-800">${o.bibsList}</b></div>
+                        </div>
+                        <div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
+                            <button onclick="closeModal('modal-chamber-detail'); openUnloadModal(${o.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded text-xs font-semibold">Termina Step</button>
+                            <button onclick="closeModal('modal-chamber-detail'); openQrModal(${o.id})" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 rounded text-xs font-semibold">Mostra QR</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            openModal('modal-chamber-detail');
         }
 
-        // --- NOVITÀ 2: DETTATURA VOCALE (SPEECH RECOGNITION) ---
+        // --- DETTATURA VOCALE (CORRETTA) ---
         function startVoiceDictation() {
             const statusEl = document.getElementById('speech-status');
             const btn = document.getElementById('btn-mic');
@@ -875,11 +934,7 @@
                 statusEl.innerText = `Trasmesso: "${speechText}"`;
                 btn.classList.remove('bg-red-600', 'animate-pulse');
                 
-                // Parsing basilare vocale
-                const lower = speechText.toLowerCase();
-                if (lower.includes('camera') || lower.includes('dm') || lower.includes('uhast')) {
-                    document.getElementById('in-oven-name.value') = speechText; // Mappa rapida o parziale
-                }
+                // Assegnazione corretta al campo input senza errori di sintassi
                 document.getElementById('in-oven-lot').value = speechText;
             };
 
@@ -895,14 +950,12 @@
             recognition.start();
         }
 
-        // --- NOVITÀ 3: PARSER EMAIL PLANNER ---
+        // --- PARSER EMAIL PLANNER ---
         function parseAndSavePlannerEmail() {
             const rawText = document.getElementById('in-plan-text').value.trim();
             if (!rawText) return alert("Incolla il testo della email!");
 
             const status = document.getElementById('in-plan-status').value;
-            
-            // Estrazione automatica titolo o prima riga significativa
             const lines = rawText.split('\n');
             const title = lines[0].length > 40 ? lines[0].slice(0, 40) + '...' : (lines[0] || 'Planning Email Planner');
 
@@ -920,18 +973,16 @@
             alert("Parser completato: email analizzata e salvata nel planning!");
         }
 
-        // --- NOVITÀ 4: QR CODE GENERATOR & VISUALIZZA PROVA ---
+        // --- QR CODE GENERATOR & VISUALIZZA PROVA ---
         function openQrModal(ovenId) {
             const o = appState.ovens.find(x => x.id === ovenId);
             if (!o) return;
 
             document.getElementById('img-modal-title').innerText = `QR Code & Dettagli - ${o.name} (${o.lot})`;
             
-            // Pulisce vecchio QR
             const qrContainer = document.getElementById('qrcode-container');
             qrContainer.innerHTML = "";
 
-            // Genera QR Code con dati sintetici della prova
             const qrData = `GQR LAB | Camera: ${o.name} | Lotto: ${o.lot} | Trial: ${o.trialId || 'N/D'} | Scadenza: ${o.dueDate} | BIB: ${o.bibsList}`;
             new QRCode(qrContainer, {
                 text: qrData,
