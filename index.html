@@ -12,6 +12,33 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
 
+    <!-- SCHERMATA DI LOGIN INIZIALE -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl">
+            <div class="text-center space-y-2">
+                <div class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h2 class="text-lg font-bold text-white">GQR Reliability Lab</h2>
+                <p class="text-xs text-slate-400">Inserisci le credenziali per accedere al sistema</p>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ID Utente</label>
+                    <input id="login-user" type="text" placeholder="admin o lachinamarco" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Password</label>
+                    <input id="login-pass" type="password" placeholder="Password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" onkeydown="if(event.key === 'Enter') handleLogin()">
+                </div>
+                <p id="login-error" class="text-xs text-red-400 text-center hidden font-medium">Credenziali non valide!</p>
+            </div>
+            <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-medium transition shadow">
+                Accedi al Lab
+            </button>
+        </div>
+    </div>
+
     <!-- Header Principale -->
     <header class="bg-slate-800 border-b border-slate-700 shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
@@ -607,11 +634,35 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Planning email, trial ID, etichette e alert guanti/fuse integrati.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Login utenti, planning email, trial ID, etichette e alert guanti/fuse integrati.' }
             ]
         };
 
+        // --- GESTIONE LOGIN UTENTI ---
+        function handleLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            if ((user === 'admin' && pass === 'gqr123') || (user === 'lachinamarco' && pass === 'lab2026')) {
+                sessionStorage.setItem('gqr_logged_in', 'true');
+                sessionStorage.setItem('gqr_user', user);
+                document.getElementById('login-screen').classList.add('hidden');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function checkSession() {
+            if (sessionStorage.getItem('gqr_logged_in') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+            }
+        }
+
         function initApp() {
+            checkSession();
             try {
                 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
                     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -622,7 +673,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v11').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v12').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -639,7 +690,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v11').set(appState);
+                            db.ref('gqr_lab_v12').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -662,15 +713,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v11', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v11').set(appState);
+                localStorage.setItem('gqr_lab_v12', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v12').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v11');
+                const saved = localStorage.getItem('gqr_lab_v12');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -726,15 +777,12 @@
         function renderSummaryCounters() {
             const todayStr = new Date().toISOString().slice(0,10);
             
-            // In partenza / oggi
             const departing = appState.ovens.filter(o => o.startDate === todayStr || o.status === 'In Camera').length;
             document.getElementById('count-departing').innerText = `${departing} Prove`;
 
-            // In scarico (scadono oggi)
             const unloading = appState.ovens.filter(o => o.dueDate === todayStr).length;
             document.getElementById('count-unloading').innerText = `${unloading} Prove`;
 
-            // Mancanti da testing (segnalati nel planning email come mancanti)
             const missing = (appState.plannerEmails || []).filter(p => p.status && p.status.includes('Mancante')).length;
             document.getElementById('count-missing').innerText = `${missing} Segnalate`;
         }
@@ -927,11 +975,9 @@
             const rawBibs = document.getElementById('in-oven-bibs').value.trim();
             const fileInput = document.getElementById('in-oven-file');
 
-            // --- ALERT POP-UP RICHIESTI ---
-            // 1. Check Fuse obbligatorio ad ogni avvio
+            // --- ALERT POP-UP ---
             alert("⚡ PROMEMORIA CHECK FUSE: Assicurati di aver effettuato il controllo dei fusibili prima di avviare la prova!");
 
-            // 2. Controllo ricetta per guanti in TC o BHAST
             const recipeLower = recipe.toLowerCase();
             if (recipeLower.includes('tc') || recipeLower.includes('bhast')) {
                 alert("🛡️ PROTOCOLLO SICUREZZA BIB: Per test TC o BHAST, ricorda di indossare i guanti per caricare i pezzi nelle BIB!");
@@ -1348,4 +1394,3 @@
     </script>
 </body>
 </html>
-
