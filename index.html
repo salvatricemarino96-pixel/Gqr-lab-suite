@@ -10,54 +10,54 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- SCHERMATA DI LOGIN INIZIALE -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl">
+    <!-- SCHERMATA DI LOGIN INIZIALE (TEMA CHIARO) -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl">
             <div class="text-center space-y-2">
-                <div class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
+                <div class="bg-sky-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
                     <i class="fa-solid fa-lock text-xl"></i>
                 </div>
-                <h2 class="text-lg font-bold text-white">GQR Reliability Lab</h2>
-                <p class="text-xs text-slate-400">Inserisci le credenziali per accedere al sistema</p>
+                <h2 class="text-lg font-bold text-slate-800">GQR Reliability Lab</h2>
+                <p class="text-xs text-slate-500">Inserisci le credenziali per accedere al sistema</p>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ID Utente</label>
-                    <input id="login-user" type="text" placeholder="admin o lachinamarco" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ID Utente</label>
+                    <input id="login-user" type="text" placeholder="admin o lachinamarco" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-sky-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Password</label>
-                    <input id="login-pass" type="password" placeholder="Password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500" onkeydown="if(event.key === 'Enter') handleLogin()">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input id="login-pass" type="password" placeholder="Password..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-sky-500" onkeydown="if(event.key === 'Enter') handleLogin()">
                 </div>
-                <p id="login-error" class="text-xs text-red-400 text-center hidden font-medium">Credenziali non valide!</p>
+                <p id="login-error" class="text-xs text-red-500 text-center hidden font-medium">Credenziali non valide!</p>
             </div>
-            <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-medium transition shadow">
+            <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded-lg text-sm font-medium transition shadow">
                 Accedi al Lab
             </button>
         </div>
     </div>
 
     <!-- Header Principale -->
-    <header class="bg-slate-800 border-b border-slate-700 shadow-lg sticky top-0 z-40">
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md">
+                <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md">
                     <i class="fa-solid fa-microchip text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide">GQR Reliability & Stress Lab</h1>
-                    <p class="text-xs text-slate-400">Camere, Cicli, Mapping & Controllo Arelis</p>
+                    <h1 class="text-lg font-bold tracking-wide text-slate-800">GQR Reliability & Stress Lab</h1>
+                    <p class="text-xs text-slate-500">Camere, Cicli, Mapping & Controllo Arelis</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-500/20 text-red-300 border border-red-500/40 px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
+                <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span id="arelis-alert-count">0 da registrare su Arelis</span>
                 </div>
-                <div id="status-badge" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
+                <div id="status-badge" class="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600">
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
                     <span id="status-text">Connessione...</span>
                 </div>
@@ -66,27 +66,27 @@
     </header>
 
     <!-- Menu di Navigazione -->
-    <nav class="bg-slate-800/60 border-b border-slate-700/60 backdrop-blur">
+    <nav class="bg-white/80 border-b border-slate-200 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto py-2">
-            <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow whitespace-nowrap">
+            <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-sky-600 text-white shadow whitespace-nowrap">
                 <i class="fa-solid fa-layer-group mr-2"></i>Camere & Flusso Prove
             </button>
-            <button onclick="switchTab('planner')" id="btn-tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('planner')" id="btn-tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-envelope-open-text mr-2"></i>Planner & Email
             </button>
-            <button onclick="switchTab('history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-clock-rotate-left mr-2"></i>Storico & Ricerca
             </button>
-            <button onclick="switchTab('mapping')" id="btn-tab-mapping" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('mapping')" id="btn-tab-mapping" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-table-cells mr-2"></i>Mapping Rapido BIB
             </button>
-            <button onclick="switchTab('inventory')" id="btn-tab-inventory" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('inventory')" id="btn-tab-inventory" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-boxes-stacked mr-2"></i>Inventario & Archivio
             </button>
-            <button onclick="switchTab('maintenance')" id="btn-tab-maintenance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('maintenance')" id="btn-tab-maintenance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-wrench mr-2"></i>Ticket Manutentori
             </button>
-            <button onclick="switchTab('logbook')" id="btn-tab-logbook" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap">
+            <button onclick="switchTab('logbook')" id="btn-tab-logbook" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-book-open mr-2"></i>Consegne Turno
             </button>
         </div>
@@ -97,46 +97,52 @@
         
         <!-- TAB 1: CAMERE & FLUSSO PROVE -->
         <section id="tab-ovens" class="tab-content space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Gestione carichi, Trial ID, Label, mapping e controllo Arelis.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-layer-group text-sky-600 mr-2"></i>Dashboard Postazioni & Camere</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Trial ID, Label, countdown e controllo Arelis.</p>
                 </div>
-                <button onclick="openModal('modal-oven')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
+                <button onclick="openModal('modal-oven')" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
             <!-- PANORAMICA GIORNALIERA (IN PARTENZA, IN SCARICO, MANCANTI DA TESTING) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-800/90 border border-blue-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                <div class="bg-white border border-sky-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-slate-400 font-medium">In Partenza / Oggi</p>
-                        <h4 id="count-departing" class="text-lg font-bold text-blue-400 mt-0.5">0 Prove</h4>
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">In Partenza / Oggi</p>
+                        <h4 id="count-departing" class="text-xl font-bold text-sky-600 mt-0.5">0 Prove</h4>
                     </div>
-                    <div class="bg-blue-500/20 p-2.5 rounded-lg text-blue-300"><i class="fa-solid fa-plane-departure text-base"></i></div>
+                    <div class="bg-sky-50 p-3 rounded-xl text-sky-600"><i class="fa-solid fa-plane-departure text-lg"></i></div>
                 </div>
-                <div class="bg-slate-800/90 border border-amber-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                <div class="bg-white border border-amber-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-slate-400 font-medium">In Scarico / Scadono Oggi</p>
-                        <h4 id="count-unloading" class="text-lg font-bold text-amber-400 mt-0.5">0 Prove</h4>
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">In Scarico / Scadono Oggi</p>
+                        <h4 id="count-unloading" class="text-xl font-bold text-amber-600 mt-0.5">0 Prove</h4>
                     </div>
-                    <div class="bg-amber-500/20 p-2.5 rounded-lg text-amber-300"><i class="fa-solid fa-box-open text-base"></i></div>
+                    <div class="bg-amber-50 p-3 rounded-xl text-amber-600"><i class="fa-solid fa-box-open text-lg"></i></div>
                 </div>
-                <div class="bg-slate-800/90 border border-red-500/30 rounded-xl p-3.5 shadow flex items-center justify-between">
+                <div class="bg-white border border-red-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-slate-400 font-medium">Mancanti da Testing (Non Consegnate)</p>
-                        <h4 id="count-missing" class="text-lg font-bold text-red-400 mt-0.5">0 Segnalate</h4>
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Mancanti da Testing</p>
+                        <h4 id="count-missing" class="text-xl font-bold text-red-600 mt-0.5">0 Segnalate</h4>
                     </div>
-                    <div class="bg-red-500/20 p-2.5 rounded-lg text-red-300"><i class="fa-solid fa-triangle-exclamation text-base"></i></div>
+                    <div class="bg-red-500/10 p-3 rounded-xl text-red-600"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
                 </div>
             </div>
 
+            <!-- BARRA DI RICERCA GLOBALE RAPIDA -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+                <i class="fa-solid fa-magnifying-glass text-slate-400 ml-2"></i>
+                <input id="search-ovens-input" type="text" oninput="renderOvens()" placeholder="Cerca rapida per Trial ID, Lotto, Camera o BIB..." class="w-full bg-transparent text-sm text-slate-800 focus:outline-none">
+            </div>
+
             <!-- MONITOR LIVE BIB IN CAMERA -->
-            <div class="bg-slate-800/90 border border-blue-500/30 rounded-xl p-4 shadow-lg space-y-3">
+            <div class="bg-white border border-sky-100 rounded-xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold text-blue-300 flex items-center">
-                        <i class="fa-solid fa-satellite-dish mr-2 text-blue-400 animate-pulse"></i>Monitor Live: BIB Occupate in Camera
+                    <h3 class="text-sm font-bold text-sky-700 flex items-center">
+                        <i class="fa-solid fa-satellite-dish mr-2 text-sky-500 animate-pulse"></i>Monitor Live: BIB Occupate in Camera
                     </h3>
                     <span class="text-xs text-slate-400">Aggiornato in tempo reale</span>
                 </div>
@@ -145,20 +151,20 @@
 
             <!-- Filtri rapidi -->
             <div class="flex flex-wrap gap-2 text-xs">
-                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium shadow">Tutti i Carichi</button>
-                <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-slate-800 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium">Da registrare su Arelis</button>
-                <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-slate-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg font-medium">Scade Oggi</button>
+                <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-sky-600 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm">Tutti i Carichi</button>
+                <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-white text-red-600 border border-red-200 px-3.5 py-2 rounded-lg font-medium hover:bg-red-50">Da registrare su Arelis</button>
+                <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-white text-amber-600 border border-amber-200 px-3.5 py-2 rounded-lg font-medium hover:bg-amber-50">Scade Oggi</button>
             </div>
 
-            <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </section>
 
         <!-- TAB 2: PLANNER & EMAIL -->
         <section id="tab-planner" class="tab-content hidden space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-envelope-open-text text-indigo-400 mr-2"></i>Email & Planning dei Planner (Turno Mattina)</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Incolla qui la tabella o il testo ricevuto via email dai Planner per preparare il lavoro del giorno dopo.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-envelope-open-text text-indigo-600 mr-2"></i>Email & Planning dei Planner (Turno Mattina)</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Incolla qui la tabella o il testo ricevuto via email dai Planner per preparare il lavoro del giorno dopo.</p>
                 </div>
                 <button onclick="openModal('modal-planner')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Incolla / Aggiungi Planning
@@ -170,20 +176,20 @@
 
         <!-- TAB 3: STORICO & RICERCA -->
         <section id="tab-history" class="tab-content hidden space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-400 mr-2"></i>Archivio Storico & Ricerca Prove</h2>
-                    <p class="text-xs text-slate-400 mt-1">Cerca qualsiasi prova passata o in corso per lotto, camera o ricetta.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Archivio Storico & Ricerca Prove</h2>
+                    <p class="text-xs text-slate-500 mt-1">Cerca qualsiasi prova passata o in corso per lotto, camera o ricetta.</p>
                 </div>
                 <div class="w-full md:w-72">
-                    <input id="search-history-input" type="text" oninput="renderHistory()" placeholder="Cerca lotto, camera..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500">
+                    <input id="search-history-input" type="text" oninput="renderHistory()" placeholder="Cerca lotto, camera..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-teal-500">
                 </div>
             </div>
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 text-xs uppercase">
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase">
                                 <th class="p-3">Data</th>
                                 <th class="p-3">Camera</th>
                                 <th class="p-3">Lotto / Trial ID</th>
@@ -200,10 +206,10 @@
 
         <!-- TAB 4: MAPPING BIB -->
         <section id="tab-mapping" class="tab-content hidden space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-table-cells text-cyan-500 mr-2"></i>Mapping Rapido BIB (Multi-Inserimento)</h2>
-                    <p class="text-xs text-slate-400 mt-1">Inserisci più BIB in un sol colpo e scarica il file ufficiale Excel.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-table-cells text-cyan-600 mr-2"></i>Mapping Rapido BIB (Multi-Inserimento)</h2>
+                    <p class="text-xs text-slate-500 mt-1">Inserisci più BIB in un sol colpo e scarica il file ufficiale Excel.</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="openModal('modal-mapping')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
@@ -214,11 +220,11 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-900/60 border-b border-slate-700 text-slate-400 text-xs uppercase">
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase">
                                 <th class="p-3">Camera</th>
                                 <th class="p-3">ID BIB</th>
                                 <th class="p-3">Slot</th>
@@ -236,10 +242,10 @@
 
         <!-- TAB 5: INVENTARIO & ARCHIVIO -->
         <section id="tab-inventory" class="tab-content hidden space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-boxes-stacked text-emerald-500 mr-2"></i>Inventario BIB & Spedizione Magazzino</h2>
-                    <p class="text-xs text-slate-400 mt-1">Seleziona le BIB pronte e mandale in archivio magazzino.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-boxes-stacked text-emerald-600 mr-2"></i>Inventario BIB & Spedizione Magazzino</h2>
+                    <p class="text-xs text-slate-500 mt-1">Seleziona le BIB pronte e mandale in archivio magazzino.</p>
                 </div>
                 <div class="flex gap-2">
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow cursor-pointer transition">
@@ -251,11 +257,11 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-900/50 border-b border-slate-700 text-slate-400">
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500">
                                 <th class="p-3 w-10"><input type="checkbox" id="select-all-bib" onclick="toggleSelectAllBibs(this)"></th>
                                 <th class="p-3">Codice / BIB</th>
                                 <th class="p-3">Lotto</th>
@@ -271,12 +277,12 @@
 
             <!-- Archivio Magazzino -->
             <div class="mt-8 space-y-3">
-                <h3 class="text-base font-bold text-slate-300 flex items-center"><i class="fa-solid fa-warehouse mr-2 text-purple-400"></i>Archivio BIB Pronti per Magazzino</h3>
-                <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow">
+                <h3 class="text-base font-bold text-slate-700 flex items-center"><i class="fa-solid fa-warehouse mr-2 text-purple-600"></i>Archivio BIB Pronti per Magazzino</h3>
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="bg-slate-900/40 border-b border-slate-700 text-slate-400 text-xs">
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs">
                                     <th class="p-3">BIB / Codice</th>
                                     <th class="p-3">Lotto</th>
                                     <th class="p-3">Quantità</th>
@@ -293,10 +299,10 @@
 
         <!-- TAB 6: TICKET MANUTENZIONE -->
         <section id="tab-maintenance" class="tab-content hidden space-y-6">
-            <div class="flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-wrench text-amber-500 mr-2"></i>Segnalazione Guasti ai Manutentori</h2>
-                    <p class="text-xs text-slate-400 mt-1">Invia la segnalazione direttamente via email al team manutenzione.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-wrench text-amber-600 mr-2"></i>Segnalazione Guasti ai Manutentori</h2>
+                    <p class="text-xs text-slate-500 mt-1">Invia la segnalazione direttamente via email al team manutenzione.</p>
                 </div>
                 <button onclick="openModal('modal-ticket')" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Nuovo Ticket Guasto
@@ -307,10 +313,10 @@
 
         <!-- TAB 7: LOGBOOK TURNI -->
         <section id="tab-logbook" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center"><i class="fa-solid fa-book-open text-purple-500 mr-2"></i>Passaggio Consegne Turno</h2>
-                    <p class="text-xs text-slate-400 mt-1">Registro consegne giornaliere per turno Mattina e Pomeriggio.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-book-open text-purple-600 mr-2"></i>Passaggio Consegne Turno</h2>
+                    <p class="text-xs text-slate-500 mt-1">Registro consegne giornaliere per turno Mattina e Pomeriggio.</p>
                 </div>
                 <button onclick="openModal('modal-log')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-pen-to-square mr-1"></i> Scrivi Nota Turno
@@ -322,282 +328,282 @@
     </main>
 
     <!-- MODALI -->
-    <!-- MODALE CARICO PROVA CON TRIAL ID, LABEL, CHECK FUSE E GUANTI -->
-    <div id="modal-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-blue-400">Carico Camera & Dati Prova (Trial ID / Label)</h3>
-                <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- MODALE CARICO PROVA -->
+    <div id="modal-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-sky-700">Carico Camera & Dati Prova</h3>
+                <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Camera / Canale (es. DM24 ch1)</label>
-                    <input id="in-oven-name" type="text" placeholder="DM24 ch1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Camera / Canale (es. DM24 ch1)</label>
+                    <input id="in-oven-name" type="text" placeholder="DM24 ch1" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Lotto</label>
-                        <input id="in-oven-lot" type="text" placeholder="CHROMITEM M02B" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Lotto</label>
+                        <input id="in-oven-lot" type="text" placeholder="CHROMITEM M02B" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Trial ID</label>
-                        <input id="in-oven-trial" type="text" placeholder="es. TR-2026-99" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-cyan-300">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Ricetta Macchina (es. uhast, tc, hts...)</label>
-                        <input id="in-oven-recipe" type="text" placeholder="uhast_130" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Label / Etichetta (per uhast, tc, hts)</label>
-                        <input id="in-oven-label" type="text" placeholder="Etichetta specifica..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Trial ID</label>
+                        <input id="in-oven-trial" type="text" placeholder="es. TR-2026-99" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-mono text-sky-700 font-semibold">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Data Inizio</label>
-                        <input id="in-oven-startdate" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta Macchina (es. uhast, tc, hts...)</label>
+                        <input id="in-oven-recipe" type="text" placeholder="uhast_130" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Ora Inizio</label>
-                        <input id="in-oven-starttime" type="time" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Label / Etichetta (per uhast, tc, hts)</label>
+                        <input id="in-oven-label" type="text" placeholder="Etichetta specifica..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data Inizio</label>
+                        <input id="in-oven-startdate" type="date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 text-slate-800 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ora Inizio</label>
+                        <input id="in-oven-starttime" type="time" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 text-slate-800 text-xs">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Temperatura</label>
-                        <input id="in-oven-temp" type="text" value="125°C" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Temperatura</label>
+                        <input id="in-oven-temp" type="text" value="125°C" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Step Ore</label>
-                        <input id="in-oven-step" type="number" value="48" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Step Ore</label>
+                        <input id="in-oven-step" type="number" value="48" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Data Scadenza</label>
-                        <input id="in-oven-duedate" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data Scadenza</label>
+                        <input id="in-oven-duedate" type="date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 text-slate-800 text-xs">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">BIB Coinvolte (es. BIB-014, BIB-015...)</label>
-                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">BIB Coinvolte (es. BIB-014, BIB-015...)</label>
+                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Allega Immagine / Report Macchina</label>
-                    <input id="in-oven-file" type="file" accept="image/*" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Allega Immagine / Report Macchina</label>
+                    <input id="in-oven-file" type="file" accept="image/*" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-slate-600 text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500 cursor-pointer">
                 </div>
                 <div class="flex items-center space-x-2 pt-1">
-                    <input id="in-oven-arelis" type="checkbox" class="w-4 h-4 accent-emerald-500">
-                    <label for="in-oven-arelis" class="text-xs text-slate-300">Carico già registrato su <b>Arelis</b></label>
+                    <input id="in-oven-arelis" type="checkbox" class="w-4 h-4 accent-emerald-600">
+                    <label for="in-oven-arelis" class="text-xs text-slate-700">Carico già registrato su <b>Arelis</b></label>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-blue-600 hover:bg-blue-500 font-medium">Salva Carico & Verifica Alert</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-oven')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="saveNewOven()" class="px-4 py-2 rounded-lg text-sm bg-sky-600 hover:bg-sky-500 text-white font-medium">Salva Carico & Verifica Alert</button>
             </div>
         </div>
     </div>
 
     <!-- MODALE INCOLLA PLANNING EMAIL PLANNER -->
-    <div id="modal-planner" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-indigo-400"><i class="fa-solid fa-paste mr-2"></i>Incolla Planning Email Planner</h3>
-                <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-planner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-indigo-700"><i class="fa-solid fa-paste mr-2"></i>Incolla Planning Email Planner</h3>
+                <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Titolo / Riferimento Giorno (es. Planning Lunedì)</label>
-                    <input id="in-plan-title" type="text" placeholder="Planning Turno Domani" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Titolo / Riferimento Giorno (es. Planning Lunedì)</label>
+                    <input id="in-plan-title" type="text" placeholder="Planning Turno Domani" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Incolla qui la tabella o il testo ricevuto via email</label>
-                    <textarea id="in-plan-text" rows="6" placeholder="Incolla l'email dei planner con le prove da preparare..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Incolla qui la tabella o il testo ricevuto via email</label>
+                    <textarea id="in-plan-text" rows="6" placeholder="Incolla l'email dei planner con le prove da preparare..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Stato Arrivo dal Testing</label>
-                    <select id="in-plan-status" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Stato Arrivo dal Testing</label>
+                    <select id="in-plan-status" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                         <option value="In Arrivo / Previsto">In Arrivo / Previsto</option>
-                        <option value="Mancante / Testing Non Consegnato" class="text-red-400">⚠️ Mancante (Testing non ha consegnato)</option>
+                        <option value="Mancante / Testing Non Consegnato" class="text-red-600 font-semibold">⚠️ Mancante (Testing non ha consegnato)</option>
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-planner')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewPlannerPlan()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 font-medium">Salva Planning</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-planner')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="saveNewPlannerPlan()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Salva Planning</button>
             </div>
         </div>
     </div>
 
     <!-- MODALE VISUALIZZAZIONE IMMAGINE MACCHINA -->
-    <div id="modal-view-image" class="fixed inset-0 bg-black/85 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                <h3 id="img-modal-title" class="font-bold text-sm text-cyan-400">Report / Immagine Macchina</h3>
-                <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-view-image" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Report / Immagine Macchina</h3>
+                <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="flex justify-center bg-slate-900 p-2 rounded-xl max-h-[75vh] overflow-auto">
+            <div class="flex justify-center bg-slate-100 p-2 rounded-xl max-h-[75vh] overflow-auto">
                 <img id="modal-oven-img-preview" src="" alt="Immagine Macchina" class="max-w-full rounded object-contain">
             </div>
             <div class="flex justify-end pt-2">
-                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-700 hover:bg-slate-600">Chiudi</button>
+                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-200 hover:bg-slate-300 text-slate-700">Chiudi</button>
             </div>
         </div>
     </div>
 
     <!-- MODALE SCARICO RAPIDO & REGISTRAZIONE FAIL PEZZI -->
-    <div id="modal-unload-fail" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-emerald-400"><i class="fa-solid fa-clipboard-check mr-2"></i>Scarico & Registrazione Fail</h3>
-                <button onclick="closeModal('modal-unload-fail')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-unload-fail" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-emerald-700"><i class="fa-solid fa-clipboard-check mr-2"></i>Scarico & Registrazione Fail</h3>
+                <button onclick="closeModal('modal-unload-fail')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <input type="hidden" id="unload-oven-id">
                 <div>
-                    <p id="unload-info-text" class="text-xs text-cyan-300 font-semibold mb-3 bg-slate-900 p-2.5 rounded-lg border border-slate-700"></p>
+                    <p id="unload-info-text" class="text-xs text-sky-800 font-semibold mb-3 bg-sky-50 p-3 rounded-lg border border-sky-200"></p>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Numero Pezzi in Fail (Scarti)</label>
-                    <input id="in-unload-fails" type="number" value="0" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold text-amber-400">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Numero Pezzi in Fail (Scarti)</label>
+                    <input id="in-unload-fails" type="number" value="0" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold text-amber-600">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Note sui Difetti / Fail riscontrati</label>
-                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto su pin..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note sui Difetti / Fail riscontrati</label>
+                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto su pin..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-unload-fail')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="confirmUnloadWithFails()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 hover:bg-emerald-500 font-medium"><i class="fa-solid fa-check mr-1"></i> Conferma & Invia a Testing</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-unload-fail')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="confirmUnloadWithFails()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 hover:bg-emerald-500 text-white font-medium"><i class="fa-solid fa-check mr-1"></i> Conferma & Invia a Testing</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD MASCHERATA -->
-    <div id="modal-edit-oven" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-amber-400"><i class="fa-solid fa-lock mr-2"></i>Gestione Protetta (Password)</h3>
-                <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD -->
+    <div id="modal-edit-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-amber-700"><i class="fa-solid fa-lock mr-2"></i>Gestione Protetta (Password)</h3>
+                <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <input type="hidden" id="edit-oven-id">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Password Lab</label>
-                    <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password Lab</label>
+                    <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nuovo Lotto</label>
-                    <input id="edit-oven-lot" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nuovo Lotto</label>
+                    <input id="edit-oven-lot" type="text" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Step Ore</label>
-                        <input id="edit-oven-step" type="number" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Step Ore</label>
+                        <input id="edit-oven-step" type="number" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Data Scadenza</label>
-                        <input id="edit-oven-due" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-white text-xs">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data Scadenza</label>
+                        <input id="edit-oven-due" type="date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-2 text-slate-800 text-xs">
                     </div>
                 </div>
             </div>
-            <div class="flex justify-between items-center pt-3 border-t border-slate-700">
-                <button onclick="confirmDeleteOven()" class="px-3 py-2 rounded-lg text-xs bg-red-600/20 text-red-400 hover:bg-red-600/30"><i class="fa-solid fa-trash mr-1"></i> Elimina Prova</button>
+            <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+                <button onclick="confirmDeleteOven()" class="px-3 py-2 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200 font-semibold"><i class="fa-solid fa-trash mr-1"></i> Elimina Prova</button>
                 <div class="flex gap-2">
-                    <button onclick="closeModal('modal-edit-oven')" class="px-3 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                    <button onclick="confirmEditOven()" class="px-3 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium">Salva Modifiche</button>
+                    <button onclick="closeModal('modal-edit-oven')" class="px-3 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                    <button onclick="confirmEditOven()" class="px-3 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 text-white font-medium">Salva Modifiche</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODALE MAPPING MULTIPLO -->
-    <div id="modal-mapping" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-cyan-400">Inserimento Multiplo Mapping BIB</h3>
-                <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-mapping" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-cyan-700">Inserimento Multiplo Mapping BIB</h3>
+                <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs text-slate-400 mb-1">Camera</label><input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
-                    <div><label class="block text-xs text-slate-400 mb-1">Slot Comune</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Camera</label><input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Slot Comune</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ID BIB (Inserisci multipli separati da virgola o spazio)</label>
-                    <textarea id="in-map-bibs" rows="2" placeholder="BIB-014, BIB-015, BIB-016..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ID BIB (Inserisci multipli separati da virgola o spazio)</label>
+                    <textarea id="in-map-bibs" rows="2" placeholder="BIB-014, BIB-015, BIB-016..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
-                    <div><label class="block text-xs text-slate-400 mb-1">Device</label><input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
-                    <div><label class="block text-xs text-slate-400 mb-1">Lotto</label><input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
-                    <div><label class="block text-xs text-slate-400 mb-1">Ricetta</label><input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Device</label><input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Lotto</label><input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
+                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta</label><input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-mapping')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewMappingMulti()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 font-medium">Genera Tutte le BIB</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-mapping')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="saveNewMappingMulti()" class="px-4 py-2 rounded-lg text-sm bg-cyan-600 hover:bg-cyan-500 text-white font-medium">Genera Tutte le BIB</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-ticket" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-amber-400">Segnala Guasto ai Manutentori</h3>
-                <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-ticket" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-amber-700">Segnala Guasto ai Manutentori</h3>
+                <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Email Manutenzione Destinataria</label>
-                    <input id="in-tkt-email" type="email" value="manutenzione@gqr-lab.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Manutenzione Destinataria</label>
+                    <input id="in-tkt-email" type="email" value="manutenzione@gqr-lab.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Descrizione Guasto / Macchina</label>
-                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Errore temperatura" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Descrizione Guasto / Macchina</label>
+                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Errore temperatura" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Priorità</label>
-                    <select id="in-tkt-prio" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Priorità</label>
+                    <select id="in-tkt-prio" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                         <option value="Alta">Alta (Macchina Ferma)</option>
                         <option value="Media" selected>Media</option>
                     </select>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-ticket')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="sendMaintenanceEmail()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 font-medium"><i class="fa-solid fa-paper-plane mr-1"></i> Invia a Manutentori</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-ticket')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="sendMaintenanceEmail()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 text-white font-medium"><i class="fa-solid fa-paper-plane mr-1"></i> Invia a Manutentori</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-log" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 class="font-bold text-lg text-purple-400">Passaggio Consegne Turno</h3>
-                <button onclick="closeModal('modal-log')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="modal-log" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-lg text-purple-700">Passaggio Consegne Turno</h3>
+                <button onclick="closeModal('modal-log')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Turno</label>
-                        <select id="in-log-shift" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Turno</label>
+                        <select id="in-log-shift" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                             <option value="Mattina (06:00 - 14:00)">Mattina (06:00 - 14:00)</option>
                             <option value="Pomeriggio (14:00 - 22:00)">Pomeriggio (14:00 - 22:00)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Operatore</label>
-                        <input id="in-log-author" type="text" placeholder="Nome operatore" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Operatore</label>
+                        <input id="in-log-author" type="text" placeholder="Nome operatore" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nota per il turno successivo</label>
-                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne, Arelis..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nota per il turno successivo</label>
+                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne, Arelis..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></textarea>
                 </div>
             </div>
-            <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                <button onclick="closeModal('modal-log')" class="px-4 py-2 rounded-lg text-sm bg-slate-700 hover:bg-slate-600">Annulla</button>
-                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 font-medium">Pubblica Nota</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-log')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
+                <button onclick="saveNewLog()" class="px-4 py-2 rounded-lg text-sm bg-purple-600 hover:bg-purple-500 text-white font-medium">Pubblica Nota</button>
             </div>
         </div>
     </div>
@@ -634,7 +640,7 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Login utenti, planning email, trial ID, etichette e alert guanti/fuse integrati.' }
+                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Tema chiaro professionale, countdown in tempo reale e ricerca globale attivi.' }
             ]
         };
 
@@ -673,7 +679,7 @@
                         if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
                     }, 3500);
 
-                    db.ref('gqr_lab_v12').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v13').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -690,7 +696,7 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v12').set(appState);
+                            db.ref('gqr_lab_v13').set(appState);
                         }
                         updateStatus(true);
                     }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
@@ -713,15 +719,15 @@
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v12', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v12').set(appState);
+                localStorage.setItem('gqr_lab_v13', JSON.stringify(appState));
+                if (isCloudActive && db) db.ref('gqr_lab_v13').set(appState);
             } catch (e) {}
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v12');
+                const saved = localStorage.getItem('gqr_lab_v13');
                 if (saved) appState = JSON.parse(saved);
             } catch (e) {}
         }
@@ -755,10 +761,10 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-700 whitespace-nowrap";
+                btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap";
             });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`btn-tab-${tabId}`).className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow whitespace-nowrap";
+            document.getElementById(`btn-tab-${tabId}`).className = "tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-sky-600 text-white shadow whitespace-nowrap";
         }
 
         function renderAll() {
@@ -800,24 +806,14 @@
                 return;
             }
 
-            const colors = [
-                'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
-                'bg-blue-500/20 text-blue-300 border-blue-500/40',
-                'bg-purple-500/20 text-purple-300 border-purple-500/40',
-                'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-                'bg-amber-500/20 text-amber-300 border-amber-500/40'
-            ];
-
-            container.innerHTML = busyBibs.map((b, idx) => {
-                const colorClass = colors[idx % colors.length];
-                return `
-                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium shadow-sm transition transform hover:scale-105 ${colorClass}">
-                    <i class="fa-solid fa-microchip"></i>
+            container.innerHTML = busyBibs.map((b) => `
+                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 text-xs font-semibold text-sky-800 shadow-sm">
+                    <i class="fa-solid fa-microchip text-sky-600"></i>
                     <span><b>${b.bib}</b></span>
-                    <span class="opacity-75">(${b.cam})</span>
-                    <span class="bg-slate-900/60 px-1.5 py-0.5 rounded text-[10px] text-slate-300 ml-1">Lotto: ${b.lot}</span>
-                </div>`;
-            }).join('');
+                    <span class="text-slate-500">(${b.cam})</span>
+                    <span class="bg-white px-1.5 py-0.5 rounded text-[10px] text-slate-600 ml-1 border border-slate-200">Lotto: ${b.lot}</span>
+                </div>
+            `).join('');
         }
 
         // --- PLANNER & EMAIL LIST ---
@@ -827,25 +823,25 @@
             const list = appState.plannerEmails || [];
 
             if (!list.length) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm bg-slate-800 rounded-xl border border-slate-700">Nessun planning email inserito. Incolla il planning dei planner per il turno di mattina.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm bg-white rounded-xl border border-slate-200">Nessun planning email inserito. Incolla il planning dei planner per il turno di mattina.</div>`;
                 return;
             }
 
             container.innerHTML = list.map(p => {
                 const isMissing = p.status && p.status.includes('Mancante');
                 return `
-                <div class="bg-slate-800 border ${isMissing ? 'border-red-500/60' : 'border-slate-700'} rounded-xl p-4 shadow-lg space-y-2">
+                <div class="bg-white border ${isMissing ? 'border-red-300 bg-red-50/30' : 'border-slate-200'} rounded-xl p-4 shadow-sm space-y-2">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h4 class="font-bold text-sm text-indigo-300 flex items-center"><i class="fa-solid fa-envelope mr-2"></i>${p.title}</h4>
+                            <h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-envelope mr-2"></i>${p.title}</h4>
                             <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Salvato il: ${p.date}</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 rounded text-xs font-bold border ${isMissing ? 'bg-red-500/20 text-red-300 border-red-500/40 animate-pulse' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}">${p.status}</span>
-                            <button onclick="deletePlannerPlan(${p.id})" class="text-xs text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
+                            <span class="px-2.5 py-1 rounded text-xs font-bold border ${isMissing ? 'bg-red-100 text-red-700 border-red-300 animate-pulse' : 'bg-emerald-100 text-emerald-700 border-emerald-300'}">${p.status}</span>
+                            <button onclick="deletePlannerPlan(${p.id})" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
-                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/60 text-xs font-mono text-slate-200 whitespace-pre-wrap">${p.text}</div>
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs font-mono text-slate-700 whitespace-pre-wrap">${p.text}</div>
                 </div>`;
             }).join('');
         }
@@ -876,16 +872,19 @@
             saveState();
         }
 
-        // --- DASHBOARD CAMERE ORDINATA & PULITA ---
+        // --- DASHBOARD CAMERE ORDINATA & PULITA CON COUNTDOWN ---
         function filterOvens(flt) {
             currentFilter = flt;
-            document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
-            document.getElementById(`flt-${flt}`).classList.add('ring-2', 'ring-blue-500');
+            document.querySelectorAll('.flt-btn').forEach(b => {
+                b.className = "flt-btn bg-white text-slate-700 border border-slate-200 px-3.5 py-2 rounded-lg font-medium hover:bg-slate-50";
+            });
+            document.getElementById(`flt-${flt}`).className = "flt-btn bg-sky-600 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm";
             renderOvens();
         }
 
         function renderOvens() {
             const todayStr = new Date().toISOString().slice(0,10);
+            const searchQuery = (document.getElementById('search-ovens-input')?.value || '').toLowerCase();
             
             const pendingArelis = appState.ovens.filter(o => !o.arelisSynced).length;
             const alertBadge = document.getElementById('arelis-alert-badge');
@@ -902,62 +901,95 @@
             if (currentFilter === 'ARELIS_PENDING') list = list.filter(o => !o.arelisSynced);
             if (currentFilter === 'DUE_TODAY') list = list.filter(o => o.dueDate === todayStr);
 
+            if (searchQuery) {
+                list = list.filter(o => 
+                    (o.name && o.name.toLowerCase().includes(searchQuery)) ||
+                    (o.lot && o.lot.toLowerCase().includes(searchQuery)) ||
+                    (o.trialId && o.trialId.toLowerCase().includes(searchQuery)) ||
+                    (o.bibsList && o.bibsList.toLowerCase().includes(searchQuery))
+                );
+            }
+
             const container = document.getElementById('ovens-grid');
             if (!list.length) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-500 text-sm">Nessuna prova in questa vista.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessuna prova trovata in questa vista.</div>`;
                 return;
             }
+
+            const now = new Date().getTime();
 
             container.innerHTML = list.map(o => {
                 const isDueToday = o.dueDate === todayStr;
                 const statusBadge = o.status === 'In Camera' 
-                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' 
-                    : 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+                    ? 'bg-sky-100 text-sky-800 border-sky-200' 
+                    : 'bg-purple-100 text-purple-800 border-purple-200';
+
+                // Calcolo Countdown / Progresso
+                let dueTime = new Date(`${o.dueDate}T23:59:59`).getTime();
+                let startTime = new Date(`${o.startDate || todayStr}T${o.startTime || '00:00'}`).getTime();
+                let totalDuration = dueTime - startTime;
+                let elapsed = now - startTime;
+                let pct = totalDuration > 0 ? Math.min(Math.max((elapsed / totalDuration) * 100, 5), 100) : 100;
+                
+                let timeRemainingMs = dueTime - now;
+                let hoursRemaining = Math.ceil(timeRemainingMs / (1000 * 60 * 60));
+                let countdownText = hoursRemaining > 0 ? `Mancano ~${hoursRemaining}h alla scadenza` : `Scaduto / In scadenza`;
 
                 const actionBtn = o.status === 'In Camera'
-                    ? `<button onclick="openUnloadModal(${o.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center shadow"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Termina Step & Registra Fail</button>`
-                    : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-1.5 px-3 rounded-lg text-xs font-medium transition text-center shadow"><i class="fa-solid fa-rotate-left mr-1"></i> Rientrato: Ricarica in Camera</button>`;
+                    ? `<button onclick="openUnloadModal(${o.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-arrow-right-from-bracket mr-1.5"></i> Termina Step & Registra Fail</button>`
+                    : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-rotate-left mr-1.5"></i> Rientrato: Ricarica in Camera</button>`;
 
                 const imgButton = o.machineImage 
-                    ? `<button onclick="viewOvenImage(${o.id})" class="text-xs bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 px-2.5 py-1 rounded border border-blue-500/30 flex items-center gap-1"><i class="fa-solid fa-image"></i> Vedi Immagine</button>`
-                    : `<span class="text-[11px] text-slate-500 italic">Nessuna immagine</span>`;
+                    ? `<button onclick="viewOvenImage(${o.id})" class="text-xs bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded border border-sky-200 flex items-center gap-1 font-medium"><i class="fa-solid fa-image"></i> Vedi Immagine</button>`
+                    : `<span class="text-[11px] text-slate-400 italic">Nessuna immagine</span>`;
 
                 return `
-                <div class="bg-slate-800/90 border ${!o.arelisSynced ? 'border-red-500/50' : (isDueToday ? 'border-amber-500 animate-pulse' : 'border-slate-700/80')} rounded-xl p-4 shadow-xl flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
+                <div class="bg-white border ${!o.arelisSynced ? 'border-red-300 shadow-red-50/50' : (isDueToday ? 'border-amber-400 shadow-amber-50/50' : 'border-slate-200')} rounded-2xl p-4 shadow-sm flex flex-col justify-between space-y-3">
+                    <div class="space-y-2.5">
                         <div class="flex justify-between items-start gap-2">
-                            <h3 class="font-bold text-base text-cyan-400 flex items-center"><i class="fa-solid fa-door-closed mr-1.5 text-blue-400"></i>${o.name}</h3>
-                            <span class="px-2 py-0.5 rounded text-[11px] font-semibold border ${statusBadge}">${o.status}</span>
+                            <h3 class="font-bold text-base text-slate-800 flex items-center"><i class="fa-solid fa-door-closed mr-2 text-sky-600"></i>${o.name}</h3>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge}">${o.status}</span>
                         </div>
                         
-                        <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 space-y-1 text-xs">
-                            <div class="flex justify-between items-center">
-                                <p class="text-slate-100 flex items-center"><i class="fa-solid fa-barcode mr-2 text-blue-400"></i><b>${o.lot}</b></p>
-                                ${o.trialId ? `<span class="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-mono text-[10px] border border-cyan-500/30">Trial: ${o.trialId}</span>` : ''}
+                        <!-- Barra Progresso Timer -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px] text-slate-500 font-medium">
+                                <span>${countdownText}</span>
+                                <span>Step +${o.stepHours}h</span>
                             </div>
-                            <p class="text-slate-300 flex items-center"><i class="fa-solid fa-temperature-high mr-2 text-red-400"></i>${o.temp} &bull; Ricetta: <b>${o.recipe}</b></p>
-                            ${o.label ? `<p class="text-amber-300 flex items-center"><i class="fa-solid fa-tag mr-2"></i> Label: <b>${o.label}</b></p>` : ''}
-                            <p class="text-slate-400 flex items-center"><i class="fa-regular fa-clock mr-2 text-cyan-300"></i> Inizio: <b>${o.startDate || 'N/D'} ${o.startTime || ''}</b></p>
-                            <p class="text-slate-400 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-400 font-bold' : ''}">${o.dueDate || 'N/D'}</b> &bull; Step: <b>+${o.stepHours}h</b> (Tot: ${o.accumulatedHours}h)</p>
-                            <p class="text-slate-300 pt-1 border-t border-slate-800 flex items-center"><i class="fa-solid fa-microchip mr-2 text-cyan-400"></i> BIB: <b>${o.bibsList || 'N/D'}</b></p>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                                <div class="bg-sky-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+                            <div class="flex justify-between items-center">
+                                <p class="text-slate-900 font-semibold flex items-center"><i class="fa-solid fa-barcode mr-2 text-sky-600"></i>${o.lot}</p>
+                                ${o.trialId ? `<span class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-sky-200">Trial: ${o.trialId}</span>` : ''}
+                            </div>
+                            <p class="text-slate-700 flex items-center"><i class="fa-solid fa-temperature-high mr-2 text-red-500"></i>${o.temp} &bull; Ricetta: <b class="ml-1 text-slate-900">${o.recipe}</b></p>
+                            ${o.label ? `<p class="text-amber-700 flex items-center"><i class="fa-solid fa-tag mr-2"></i> Label: <b>${o.label}</b></p>` : ''}
+                            <p class="text-slate-500 flex items-center"><i class="fa-regular fa-clock mr-2 text-sky-600"></i> Inizio: <b>${o.startDate || 'N/D'} ${o.startTime || ''}</b></p>
+                            <p class="text-slate-500 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-600 font-bold' : 'text-slate-700'}">${o.dueDate || 'N/D'}</b> (Tot: ${o.accumulatedHours}h)</p>
+                            <p class="text-slate-700 pt-1.5 border-t border-slate-200 flex items-center"><i class="fa-solid fa-microchip mr-2 text-sky-600"></i> BIB: <b class="ml-1 text-slate-900">${o.bibsList || 'N/D'}</b></p>
                         </div>
                     </div>
 
                     <div class="space-y-2 pt-1">
-                        <div class="flex justify-between items-center bg-slate-900/40 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                            <span class="text-xs text-slate-400">Report Macchina:</span>
+                        <div class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 font-medium">Report Macchina:</span>
                             ${imgButton}
                         </div>
 
-                        <button onclick="toggleArelis(${o.id})" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'}">
-                            <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+                        <button onclick="toggleArelis(${o.id})" class="w-full py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-300 animate-pulse'}">
+                            <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check text-emerald-600' : 'fa-circle-exclamation text-red-600'}"></i>
                             ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS'}
                         </button>
 
                         ${actionBtn}
 
                         <div class="flex justify-end pt-1">
-                            <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-white px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina (Protetto)</button>
+                            <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina (Protetto)</button>
                         </div>
                     </div>
                 </div>`;
@@ -1150,18 +1182,18 @@
             );
 
             if (!filtered.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Nessun record trovato nello storico.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Nessun record trovato nello storico.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map(h => `
-                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
-                    <td class="p-3 text-slate-400">${h.date}</td>
-                    <td class="p-3 font-bold text-blue-400">${h.name}</td>
-                    <td class="p-3 font-semibold text-slate-200">${h.lot}</td>
-                    <td class="p-3 text-amber-300">${h.recipe}</td>
-                    <td class="p-3 text-slate-300">${h.hours}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-amber-500/20 text-amber-300 font-semibold">${h.fails || 'N/D'}</span></td>
+                <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                    <td class="p-3 text-slate-500">${h.date}</td>
+                    <td class="p-3 font-bold text-sky-700">${h.name}</td>
+                    <td class="p-3 font-semibold text-slate-800">${h.lot}</td>
+                    <td class="p-3 text-amber-700">${h.recipe}</td>
+                    <td class="p-3 text-slate-600">${h.hours}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 font-semibold">${h.fails || 'N/D'}</span></td>
                 </tr>
             `).join('');
         }
@@ -1170,18 +1202,18 @@
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
             if (!appState.mapping.length) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">Nessuna riga di mapping.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Nessuna riga di mapping.</td></tr>`;
                 return;
             }
             tbody.innerHTML = appState.mapping.map(m => `
-                <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
-                    <td class="p-3 font-bold text-blue-400">${m.cam}</td>
-                    <td class="p-3 font-semibold text-cyan-300">${m.bib}</td>
-                    <td class="p-3 text-slate-300">${m.slot}</td>
-                    <td class="p-3 text-slate-200">${m.dev}</td>
-                    <td class="p-3 text-slate-300">${m.lot}</td>
-                    <td class="p-3 text-amber-300">${m.rec}</td>
-                    <td class="p-3 text-right"><button onclick="deleteMapping(${m.id})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
+                <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                    <td class="p-3 font-bold text-sky-700">${m.cam}</td>
+                    <td class="p-3 font-semibold text-cyan-700">${m.bib}</td>
+                    <td class="p-3 text-slate-600">${m.slot}</td>
+                    <td class="p-3 text-slate-800">${m.dev}</td>
+                    <td class="p-3 text-slate-600">${m.lot}</td>
+                    <td class="p-3 text-amber-700">${m.rec}</td>
+                    <td class="p-3 text-right"><button onclick="deleteMapping(${m.id})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -1232,31 +1264,31 @@
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
             if (!appState.inventory.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 text-xs">Nessun elemento in inventario. Importa un file Excel.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa un file Excel.</td></tr>`;
             } else {
                 tbody.innerHTML = appState.inventory.map((i, idx) => `
-                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition text-xs">
-                        <td class="p-3"><input type="checkbox" class="bib-checkbox accent-blue-500" data-index="${idx}"></td>
-                        <td class="p-3 font-medium">${i.code}</td>
-                        <td class="p-3 text-slate-300">${i.lot}</td>
-                        <td class="p-3 text-slate-300">${i.qty}</td>
-                        <td class="p-3 text-slate-300">${i.rack}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">${i.status}</span></td>
+                    <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                        <td class="p-3"><input type="checkbox" class="bib-checkbox accent-sky-600" data-index="${idx}"></td>
+                        <td class="p-3 font-medium text-slate-800">${i.code}</td>
+                        <td class="p-3 text-slate-600">${i.lot}</td>
+                        <td class="p-3 text-slate-600">${i.qty}</td>
+                        <td class="p-3 text-slate-600">${i.rack}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-semibold">${i.status}</span></td>
                     </tr>
                 `).join('');
             }
 
             const archBody = document.getElementById('archive-table-body');
             if (!appState.archive.length) {
-                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 text-xs">Nessuna BIB in archivio magazzino.</td></tr>`;
+                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs">Nessuna BIB in archivio magazzino.</td></tr>`;
             } else {
                 archBody.innerHTML = appState.archive.map(a => `
-                    <tr class="border-b border-slate-700/50 text-xs">
-                        <td class="p-3 font-semibold text-purple-300">${a.code}</td>
-                        <td class="p-3 text-slate-300">${a.lot}</td>
-                        <td class="p-3 text-slate-300">${a.qty}</td>
+                    <tr class="border-b border-slate-200 text-xs">
+                        <td class="p-3 font-semibold text-purple-700">${a.code}</td>
+                        <td class="p-3 text-slate-600">${a.lot}</td>
+                        <td class="p-3 text-slate-600">${a.qty}</td>
                         <td class="p-3 text-slate-400">${a.date}</td>
-                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded">Ripristina</button></td>
+                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border border-slate-200">Ripristina</button></td>
                     </tr>
                 `).join('');
             }
@@ -1325,16 +1357,16 @@
         function renderMaintenance() {
             const container = document.getElementById('maintenance-list');
             if (!appState.maintenance.length) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">Nessun ticket di guasto attivo.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessun ticket di guasto attivo.</div>`;
                 return;
             }
             container.innerHTML = appState.maintenance.map(m => `
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl flex justify-between items-center gap-3 shadow">
+                <div class="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center gap-3 shadow-sm">
                     <div>
-                        <h4 class="font-bold text-sm text-slate-200">${m.title}</h4>
-                        <p class="text-xs text-slate-400 mt-1">${m.date} &bull; Destinatario: <b>${m.email}</b> &bull; Priorità: <span class="text-red-400">${m.priority}</span></p>
+                        <h4 class="font-bold text-sm text-slate-800">${m.title}</h4>
+                        <p class="text-xs text-slate-500 mt-1">${m.date} &bull; Destinatario: <b>${m.email}</b> &bull; Priorità: <span class="text-red-600 font-semibold">${m.priority}</span></p>
                     </div>
-                    <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-600/20 text-red-400 px-3 py-1.5 rounded">Risolto</button>
+                    <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded font-medium">Risolto</button>
                 </div>
             `).join('');
         }
@@ -1361,15 +1393,15 @@
         function renderLogbook() {
             const container = document.getElementById('logbook-list');
             container.innerHTML = appState.logbook.map(l => `
-                <div class="bg-gradient-to-br from-slate-800 to-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-xl flex flex-col justify-between space-y-3">
+                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between space-y-3">
                     <div class="flex justify-between items-start">
-                        <span class="px-3 py-1 rounded-full text-xs font-bold ${l.shift.startsWith('Mattina') ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'}">${l.shift}</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${l.shift.startsWith('Mattina') ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-purple-100 text-purple-800 border border-purple-200'}">${l.shift}</span>
                         <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${l.date}</span>
                     </div>
-                    <p class="text-sm text-slate-100 leading-relaxed">${l.text}</p>
-                    <div class="pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs text-slate-400">
-                        <span>Operatore: <b class="text-slate-200">${l.author}</b></span>
-                        <i class="fa-solid fa-circle-check text-emerald-400"> Consegnato</i>
+                    <p class="text-sm text-slate-700 leading-relaxed">${l.text}</p>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                        <span>Operatore: <b class="text-slate-800">${l.author}</b></span>
+                        <i class="fa-solid fa-circle-check text-emerald-600 font-medium"> Consegnato</i>
                     </div>
                 </div>
             `).join('');
