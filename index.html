@@ -4,23 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GQR Reliability & Stress Lab - Operations Suite</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS per leggere e scrivere file Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- QRCode.js per generare QR Code istantanei -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Firebase SDK per il database in tempo reale -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- SCHERMATA DI LOGIN INIZIALE (TEMA CHIARO) -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- SCHERMATA DI LOGIN (PROTEZIONE ACCESSO) -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 space-y-5 shadow-2xl">
             <div class="text-center space-y-2">
                 <div class="bg-sky-600 text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto shadow-md">
                     <i class="fa-solid fa-lock text-xl"></i>
                 </div>
                 <h2 class="text-lg font-bold text-slate-800">GQR Reliability Lab</h2>
-                <p class="text-xs text-slate-500">Inserisci le credenziali per accedere al sistema</p>
+                <p class="text-xs text-slate-500">Inserisci le credenziali per accedere alla suite operativa</p>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
@@ -29,17 +35,17 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                    <input id="login-pass" type="password" placeholder="Password..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-sky-500" onkeydown="if(event.key === 'Enter') handleLogin()">
+                    <input id="login-pass" type="password" placeholder="Inserisci password..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-sm focus:outline-none focus:border-sky-500" onkeydown="if(event.key === 'Enter') handleLogin()">
                 </div>
-                <p id="login-error" class="text-xs text-red-500 text-center hidden font-medium">Credenziali non valide!</p>
+                <p id="login-error" class="text-xs text-red-500 text-center hidden font-medium">Credenziali non valide! Riprova.</p>
             </div>
-            <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded-lg text-sm font-medium transition shadow">
+            <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2.5 rounded-lg text-sm font-semibold transition shadow">
                 Accedi al Lab
             </button>
         </div>
     </div>
 
-    <!-- Header Principale -->
+    <!-- HEADER PRINCIPALE -->
     <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
@@ -51,25 +57,33 @@
                     <p class="text-xs text-slate-500">Camere, Cicli, Mapping & Controllo Arelis</p>
                 </div>
             </div>
-            
             <div class="flex items-center gap-2">
+                <!-- Badge di Allerta per Arelis -->
                 <div id="arelis-alert-badge" class="hidden items-center space-x-1.5 bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded-full text-xs font-semibold animate-pulse">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span id="arelis-alert-count">0 da registrare su Arelis</span>
                 </div>
+                <!-- Stato Connessione Cloud -->
                 <div id="status-badge" class="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 text-xs font-medium text-slate-600">
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
                     <span id="status-text">Connessione...</span>
                 </div>
+                <!-- Bottone Logout -->
+                <button onclick="handleLogout()" title="Esci dal sistema" class="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 px-2.5 py-1.5 rounded-full border border-slate-200 text-xs transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Menu di Navigazione -->
+    <!-- MENU DI NAVIGAZIONE A SCHEDE (TABS) -->
     <nav class="bg-white/80 border-b border-slate-200 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 flex space-x-2 overflow-x-auto py-2">
             <button onclick="switchTab('ovens')" id="btn-tab-ovens" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-sky-600 text-white shadow whitespace-nowrap">
                 <i class="fa-solid fa-layer-group mr-2"></i>Camere & Flusso Prove
+            </button>
+            <button onclick="switchTab('digitaltwin')" id="btn-tab-digitaltwin" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
+                <i class="fa-solid fa-map-location-dot mr-2"></i>Digital Twin Reparto
             </button>
             <button onclick="switchTab('planner')" id="btn-tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
                 <i class="fa-solid fa-envelope-open-text mr-2"></i>Planner & Email
@@ -92,53 +106,63 @@
         </div>
     </nav>
 
-    <!-- Contenuto Principale -->
+    <!-- CONTENUTO PRINCIPALE -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
         
-        <!-- TAB 1: CAMERE & FLUSSO PROVE -->
+        <!-- ========================================================================= -->
+        <!-- TAB 1: DASHBOARD CAMERE & FLUSSO PROVE                                    -->
+        <!-- ========================================================================= -->
         <section id="tab-ovens" class="tab-content space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-layer-group text-sky-600 mr-2"></i>Dashboard Postazioni & Camere</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Trial ID, Label, countdown e controllo Arelis.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-layer-group text-sky-600 mr-2"></i>Dashboard Postazioni & Camere
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestione carichi, Trial ID, Label, countdown ore e verifica sincronizzazione Arelis.</p>
                 </div>
                 <button onclick="openModal('modal-oven')" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Carica Nuova Prova
                 </button>
             </div>
 
-            <!-- PANORAMICA GIORNALIERA (IN PARTENZA, IN SCARICO, MANCANTI DA TESTING) -->
+            <!-- CONTATORI RIEPILOGATIVI -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white border border-sky-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">In Partenza / Oggi</p>
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">In Partenza / Attive</p>
                         <h4 id="count-departing" class="text-xl font-bold text-sky-600 mt-0.5">0 Prove</h4>
                     </div>
-                    <div class="bg-sky-50 p-3 rounded-xl text-sky-600"><i class="fa-solid fa-plane-departure text-lg"></i></div>
+                    <div class="bg-sky-50 p-3 rounded-xl text-sky-600">
+                        <i class="fa-solid fa-plane-departure text-lg"></i>
+                    </div>
                 </div>
                 <div class="bg-white border border-amber-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
                         <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">In Scarico / Scadono Oggi</p>
                         <h4 id="count-unloading" class="text-xl font-bold text-amber-600 mt-0.5">0 Prove</h4>
                     </div>
-                    <div class="bg-amber-50 p-3 rounded-xl text-amber-600"><i class="fa-solid fa-box-open text-lg"></i></div>
+                    <div class="bg-amber-50 p-3 rounded-xl text-amber-600">
+                        <i class="fa-solid fa-box-open text-lg"></i>
+                    </div>
                 </div>
                 <div class="bg-white border border-red-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
                     <div>
                         <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Mancanti da Testing</p>
                         <h4 id="count-missing" class="text-xl font-bold text-red-600 mt-0.5">0 Segnalate</h4>
                     </div>
-                    <div class="bg-red-500/10 p-3 rounded-xl text-red-600"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+                    <div class="bg-red-50 p-3 rounded-xl text-red-600">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- BARRA DI RICERCA GLOBALE RAPIDA -->
+            <!-- BARRA DI RICERCA RAPIDA -->
             <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
                 <i class="fa-solid fa-magnifying-glass text-slate-400 ml-2"></i>
-                <input id="search-ovens-input" type="text" oninput="renderOvens()" placeholder="Cerca rapida per Trial ID, Lotto, Camera o BIB..." class="w-full bg-transparent text-sm text-slate-800 focus:outline-none">
+                <input id="search-ovens-input" type="text" oninput="renderOvens()" placeholder="Cerca rapida per Trial ID, Lotto, Camera, Ricetta o BIB..." class="w-full bg-transparent text-sm text-slate-800 focus:outline-none">
             </div>
 
-            <!-- MONITOR LIVE BIB IN CAMERA -->
+            <!-- MONITOR LIVE BIB OCCUPATE -->
             <div class="bg-white border border-sky-100 rounded-xl p-4 shadow-sm space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="text-sm font-bold text-sky-700 flex items-center">
@@ -149,40 +173,77 @@
                 <div id="live-bibs-container" class="flex flex-wrap gap-2 pt-1"></div>
             </div>
 
-            <!-- Filtri rapidi -->
+            <!-- FILTRI RAPIDI -->
             <div class="flex flex-wrap gap-2 text-xs">
                 <button onclick="filterOvens('ALL')" id="flt-ALL" class="flt-btn bg-sky-600 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm">Tutti i Carichi</button>
                 <button onclick="filterOvens('ARELIS_PENDING')" id="flt-ARELIS_PENDING" class="flt-btn bg-white text-red-600 border border-red-200 px-3.5 py-2 rounded-lg font-medium hover:bg-red-50">Da registrare su Arelis</button>
                 <button onclick="filterOvens('DUE_TODAY')" id="flt-DUE_TODAY" class="flt-btn bg-white text-amber-600 border border-amber-200 px-3.5 py-2 rounded-lg font-medium hover:bg-amber-50">Scade Oggi</button>
             </div>
 
+            <!-- GRIGLIA SCHEDE PROVE -->
             <div id="ovens-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </section>
 
-        <!-- TAB 2: PLANNER & EMAIL -->
+        <!-- ========================================================================= -->
+        <!-- TAB 2: DIGITAL TWIN REPARTO (CON MENU A TENDINA E MULTIPROVA)             -->
+        <!-- ========================================================================= -->
+        <section id="tab-digitaltwin" class="tab-content hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-map-location-dot text-sky-600 mr-2"></i>Digital Twin: Reparto Camere & Multi-Prova
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Filtra per singola camera dal menu a tendina o ispeziona tutte le prove caricate in ogni postazione.</p>
+                </div>
+                <div class="w-full sm:w-auto flex items-center gap-2">
+                    <label for="dt-camera-select" class="text-xs font-semibold text-slate-600">Seleziona Camera:</label>
+                    <select id="dt-camera-select" onchange="filterDigitalTwinDropdown()" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-sky-500">
+                        <option value="ALL">🔍 Tutte le Camere del Reparto</option>
+                        <option value="DM24 ch1">DM24 ch1</option>
+                        <option value="DM24 ch2">DM24 ch2</option>
+                        <option value="uHAST 1">uHAST 1</option>
+                        <option value="uHAST 2">uHAST 2</option>
+                        <option value="TC Chamber">TC Chamber</option>
+                        <option value="HTS Lab">HTS Lab</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- MAPPA DELLE CAMERE -->
+            <div id="digital-twin-map" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: PLANNER & PARSER EMAIL                                             -->
+        <!-- ========================================================================= -->
         <section id="tab-planner" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-envelope-open-text text-indigo-600 mr-2"></i>Email & Planning dei Planner (Turno Mattina)</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Incolla qui la tabella o il testo ricevuto via email dai Planner per preparare il lavoro del giorno dopo.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-envelope-open-text text-indigo-600 mr-2"></i>Email & Planning dei Planner (Turno Mattina)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Incolla qui l'email dei Planner: il sistema estrarrà automaticamente i dati principali e segnalerà eventuali lotti mancanti.</p>
                 </div>
                 <button onclick="openModal('modal-planner')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
-                    <i class="fa-solid fa-plus mr-1"></i> Incolla / Aggiungi Planning
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Incolla & Parser Intelligente
                 </button>
             </div>
-
             <div id="planner-list" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 3: STORICO & RICERCA -->
+        <!-- ========================================================================= -->
+        <!-- TAB 4: STORICO & RICERCA                                                   -->
+        <!-- ========================================================================= -->
         <section id="tab-history" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Archivio Storico & Ricerca Prove</h2>
-                    <p class="text-xs text-slate-500 mt-1">Cerca qualsiasi prova passata o in corso per lotto, camera o ricetta.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Archivio Storico & Ricerca Prove
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Consulta lo storico di tutti gli step completati, le ore accumulate e gli scarti registrati.</p>
                 </div>
                 <div class="w-full md:w-72">
-                    <input id="search-history-input" type="text" oninput="renderHistory()" placeholder="Cerca lotto, camera..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-teal-500">
+                    <input id="search-history-input" type="text" oninput="renderHistory()" placeholder="Cerca per lotto, camera, Trial ID..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-teal-500">
                 </div>
             </div>
             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
@@ -190,7 +251,7 @@
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase">
-                                <th class="p-3">Data</th>
+                                <th class="p-3">Data Scarico</th>
                                 <th class="p-3">Camera</th>
                                 <th class="p-3">Lotto / Trial ID</th>
                                 <th class="p-3">Ricetta & Temp</th>
@@ -204,12 +265,16 @@
             </div>
         </section>
 
-        <!-- TAB 4: MAPPING BIB -->
+        <!-- ========================================================================= -->
+        <!-- TAB 5: MAPPING RAPIDO BIB                                                 -->
+        <!-- ========================================================================= -->
         <section id="tab-mapping" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-table-cells text-cyan-600 mr-2"></i>Mapping Rapido BIB (Multi-Inserimento)</h2>
-                    <p class="text-xs text-slate-500 mt-1">Inserisci più BIB in un sol colpo e scarica il file ufficiale Excel.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-table-cells text-cyan-600 mr-2"></i>Mapping Rapido BIB (Multi-Inserimento)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Associa rapidamente più BIB a una camera/slot ed esporta la tabella in formato Excel (.xlsx).</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="openModal('modal-mapping')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
@@ -240,12 +305,16 @@
             </div>
         </section>
 
-        <!-- TAB 5: INVENTARIO & ARCHIVIO -->
+        <!-- ========================================================================= -->
+        <!-- TAB 6: INVENTARIO & ARCHIVIO MAGAZZINO                                    -->
+        <!-- ========================================================================= -->
         <section id="tab-inventory" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-boxes-stacked text-emerald-600 mr-2"></i>Inventario BIB & Spedizione Magazzino</h2>
-                    <p class="text-xs text-slate-500 mt-1">Seleziona le BIB pronte e mandale in archivio magazzino.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-boxes-stacked text-emerald-600 mr-2"></i>Inventario BIB & Spedizione Magazzino
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Importa la lista BIB da Excel, seleziona quelle terminate e spostale nell'archivio magazzino.</p>
                 </div>
                 <div class="flex gap-2">
                     <label class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow cursor-pointer transition">
@@ -257,6 +326,8 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Tabella Inventario Attivo -->
             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
@@ -264,9 +335,9 @@
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500">
                                 <th class="p-3 w-10"><input type="checkbox" id="select-all-bib" onclick="toggleSelectAllBibs(this)"></th>
                                 <th class="p-3">Codice / BIB</th>
-                                <th class="p-3">Lotto</th>
+                                <th class="p-3">Lotto / Prodotto</th>
                                 <th class="p-3">Quantità</th>
-                                <th class="p-3">Posizione Rack</th>
+                                <th class="p-3">Posizione Rack / Camera</th>
                                 <th class="p-3">Stato</th>
                             </tr>
                         </thead>
@@ -275,9 +346,11 @@
                 </div>
             </div>
 
-            <!-- Archivio Magazzino -->
+            <!-- Sezione Archivio Magazzino -->
             <div class="mt-8 space-y-3">
-                <h3 class="text-base font-bold text-slate-700 flex items-center"><i class="fa-solid fa-warehouse mr-2 text-purple-600"></i>Archivio BIB Pronti per Magazzino</h3>
+                <h3 class="text-base font-bold text-slate-700 flex items-center">
+                    <i class="fa-solid fa-warehouse mr-2 text-purple-600"></i>Archivio BIB Pronte per Magazzino
+                </h3>
                 <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
@@ -297,12 +370,16 @@
             </div>
         </section>
 
-        <!-- TAB 6: TICKET MANUTENZIONE -->
+        <!-- ========================================================================= -->
+        <!-- TAB 7: TICKET MANUTENZIONE                                                -->
+        <!-- ========================================================================= -->
         <section id="tab-maintenance" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-wrench text-amber-600 mr-2"></i>Segnalazione Guasti ai Manutentori</h2>
-                    <p class="text-xs text-slate-500 mt-1">Invia la segnalazione direttamente via email al team manutenzione.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-wrench text-amber-600 mr-2"></i>Segnalazione Guasti ai Manutentori
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Registra un fermo macchina e invia automaticamente una mail al team di manutenzione.</p>
                 </div>
                 <button onclick="openModal('modal-ticket')" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-plus mr-1"></i> Nuovo Ticket Guasto
@@ -311,12 +388,16 @@
             <div id="maintenance-list" class="space-y-3"></div>
         </section>
 
-        <!-- TAB 7: LOGBOOK TURNI -->
+        <!-- ========================================================================= -->
+        <!-- TAB 8: LOGBOOK / CONSEGNE TURNO                                           -->
+        <!-- ========================================================================= -->
         <section id="tab-logbook" class="tab-content hidden space-y-6">
             <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div>
-                    <h2 class="text-xl font-bold flex items-center text-slate-800"><i class="fa-solid fa-book-open text-purple-600 mr-2"></i>Passaggio Consegne Turno</h2>
-                    <p class="text-xs text-slate-500 mt-1">Registro consegne giornaliere per turno Mattina e Pomeriggio.</p>
+                    <h2 class="text-xl font-bold flex items-center text-slate-800">
+                        <i class="fa-solid fa-book-open text-purple-600 mr-2"></i>Passaggio Consegne Turno
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Registro comunicazioni operative tra turno Mattina e turno Pomeriggio.</p>
                 </div>
                 <button onclick="openModal('modal-log')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition">
                     <i class="fa-solid fa-pen-to-square mr-1"></i> Scrivi Nota Turno
@@ -327,17 +408,56 @@
 
     </main>
 
-    <!-- MODALI -->
-    <!-- MODALE CARICO PROVA -->
+    <!-- ========================================================================= -->
+    <!-- MODALI INTERATTIVE                                                        -->
+    <!-- ========================================================================= -->
+
+    <!-- 1. MODALE DETTAGLIO MULTI-PROVA CAMERA (DIGITAL TWIN) -->
+    <div id="modal-chamber-detail" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 id="chamber-detail-title" class="font-bold text-lg text-sky-700 flex items-center">
+                    <i class="fa-solid fa-door-closed mr-2"></i>Dettaglio Postazione
+                </h3>
+                <button onclick="closeModal('modal-chamber-detail')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500">Elenco completo delle prove attualmente in corso in questa camera:</p>
+            <div id="chamber-detail-list" class="space-y-3"></div>
+            <div class="flex justify-end pt-3 border-t border-slate-200">
+                <button onclick="closeModal('modal-chamber-detail')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MODALE CARICO NUOVA PROVA (CON DETTATURA VOCALE) -->
     <div id="modal-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-sky-700">Carico Camera & Dati Prova</h3>
-                <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-lg text-sky-700 flex items-center">Carico Camera & Dati Prova</h3>
+                <button onclick="closeModal('modal-oven')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
+
+            <!-- Box Dettatura Vocale -->
+            <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-sky-600 text-white p-2 rounded-lg"><i class="fa-solid fa-microphone"></i></div>
+                    <div>
+                        <p class="text-xs font-bold text-sky-900">Dettatura Vocale (Mani Occupate)</p>
+                        <p id="speech-status" class="text-[11px] text-sky-700">Premi per dettare il nome del lotto</p>
+                    </div>
+                </div>
+                <button type="button" onclick="startVoiceDictation()" id="btn-mic" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">
+                    Avvia Ascolto
+                </button>
+            </div>
+
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Camera / Canale (es. DM24 ch1)</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Camera / Canale (es. DM24 ch1, uHAST 1)</label>
                     <input id="in-oven-name" type="text" placeholder="DM24 ch1" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -352,11 +472,11 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta Macchina (es. uhast, tc, hts...)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta Macchina</label>
                         <input id="in-oven-recipe" type="text" placeholder="uhast_130" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Label / Etichetta (per uhast, tc, hts)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Label / Etichetta</label>
                         <input id="in-oven-label" type="text" placeholder="Etichetta specifica..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                 </div>
@@ -385,11 +505,11 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">BIB Coinvolte (es. BIB-014, BIB-015...)</label>
-                    <textarea id="in-oven-bibs" rows="2" placeholder="Incolla le BIB..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">BIB Coinvolte (separate da virgola o spazio)</label>
+                    <textarea id="in-oven-bibs" rows="2" placeholder="BIB-014, BIB-015..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Allega Immagine / Report Macchina</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Allega Immagine / Foto Setup</label>
                     <input id="in-oven-file" type="file" accept="image/*" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1.5 text-slate-600 text-xs file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500 cursor-pointer">
                 </div>
                 <div class="flex items-center space-x-2 pt-1">
@@ -404,21 +524,21 @@
         </div>
     </div>
 
-    <!-- MODALE INCOLLA PLANNING EMAIL PLANNER -->
+    <!-- 3. MODALE PARSER EMAIL PLANNER -->
     <div id="modal-planner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-indigo-700"><i class="fa-solid fa-paste mr-2"></i>Incolla Planning Email Planner</h3>
-                <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-lg text-indigo-700">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Parser Intelligente Email Planner
+                </h3>
+                <button onclick="closeModal('modal-planner')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Titolo / Riferimento Giorno (es. Planning Lunedì)</label>
-                    <input id="in-plan-title" type="text" placeholder="Planning Turno Domani" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Incolla qui la tabella o il testo ricevuto via email</label>
-                    <textarea id="in-plan-text" rows="6" placeholder="Incolla l'email dei planner con le prove da preparare..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Incolla qui l'intera email dei Planner</label>
+                    <textarea id="in-plan-text" rows="6" placeholder="Incolla il testo ricevuto via email..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono"></textarea>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Stato Arrivo dal Testing</label>
@@ -430,33 +550,43 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
                 <button onclick="closeModal('modal-planner')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
-                <button onclick="saveNewPlannerPlan()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Salva Planning</button>
+                <button onclick="parseAndSavePlannerEmail()" class="px-4 py-2 rounded-lg text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-medium">Analizza & Salva Planning</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE VISUALIZZAZIONE IMMAGINE MACCHINA -->
+    <!-- 4. MODALE QR CODE & ANTEPRIMA IMMAGINE -->
     <div id="modal-view-image" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl">
+        <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Report / Immagine Macchina</h3>
-                <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 id="img-modal-title" class="font-bold text-sm text-sky-700">Dettaglio Prova & QR Code</h3>
+                <button onclick="closeModal('modal-view-image')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
-            <div class="flex justify-center bg-slate-100 p-2 rounded-xl max-h-[75vh] overflow-auto">
-                <img id="modal-oven-img-preview" src="" alt="Immagine Macchina" class="max-w-full rounded object-contain">
+            <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <div id="qrcode-container" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200"></div>
+                <p class="text-xs text-slate-500 text-center">Inquadra questo QR Code con lo smartphone per richiamare subito i dati della prova.</p>
+            </div>
+            <div id="img-preview-wrapper" class="hidden justify-center bg-slate-100 p-2 rounded-xl max-h-[50vh] overflow-auto">
+                <img id="modal-oven-img-preview" src="" alt="Immagine" class="max-w-full rounded object-contain">
             </div>
             <div class="flex justify-end pt-2">
-                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-200 hover:bg-slate-300 text-slate-700">Chiudi</button>
+                <button onclick="closeModal('modal-view-image')" class="px-4 py-1.5 rounded-lg text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium">Chiudi</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE SCARICO RAPIDO & REGISTRAZIONE FAIL PEZZI -->
+    <!-- 5. MODALE SCARICO & REGISTRAZIONE FAIL -->
     <div id="modal-unload-fail" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-emerald-700"><i class="fa-solid fa-clipboard-check mr-2"></i>Scarico & Registrazione Fail</h3>
-                <button onclick="closeModal('modal-unload-fail')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-lg text-emerald-700">
+                    <i class="fa-solid fa-clipboard-check mr-2"></i>Scarico & Registrazione Fail
+                </h3>
+                <button onclick="closeModal('modal-unload-fail')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <input type="hidden" id="unload-oven-id">
@@ -468,28 +598,32 @@
                     <input id="in-unload-fails" type="number" value="0" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold text-amber-600">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note sui Difetti / Fail riscontrati</label>
-                    <textarea id="in-unload-notes" rows="2" placeholder="Es. nessun difetto, oppure guasto su pin..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Note sui Difetti / Fail</label>
+                    <textarea id="in-unload-notes" rows="2" placeholder="Inserisci eventuali note sui difetti..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
                 <button onclick="closeModal('modal-unload-fail')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
-                <button onclick="confirmUnloadWithFails()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 hover:bg-emerald-500 text-white font-medium"><i class="fa-solid fa-check mr-1"></i> Conferma & Invia a Testing</button>
+                <button onclick="confirmUnloadWithFails()" class="px-4 py-2 rounded-lg text-sm bg-emerald-600 hover:bg-emerald-500 text-white font-medium">Conferma & Invia a Testing</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE MODIFICA / ELIMINAZIONE PROTETTA DA PASSWORD -->
+    <!-- 6. MODALE MODIFICA / ELIMINA PROVA (PROTETTO DA PASSWORD) -->
     <div id="modal-edit-oven" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-amber-700"><i class="fa-solid fa-lock mr-2"></i>Gestione Protetta (Password)</h3>
-                <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-lg text-amber-700">
+                    <i class="fa-solid fa-lock mr-2"></i>Gestione Protetta (Password)
+                </h3>
+                <button onclick="closeModal('modal-edit-oven')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <input type="hidden" id="edit-oven-id">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password Lab</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password Lab (gqr123)</label>
                     <input id="edit-oven-pwd" type="password" placeholder="Inserisci password..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
@@ -508,7 +642,9 @@
                 </div>
             </div>
             <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-                <button onclick="confirmDeleteOven()" class="px-3 py-2 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200 font-semibold"><i class="fa-solid fa-trash mr-1"></i> Elimina Prova</button>
+                <button onclick="confirmDeleteOven()" class="px-3 py-2 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200 font-semibold">
+                    <i class="fa-solid fa-trash mr-1"></i> Elimina Prova
+                </button>
                 <div class="flex gap-2">
                     <button onclick="closeModal('modal-edit-oven')" class="px-3 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
                     <button onclick="confirmEditOven()" class="px-3 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 text-white font-medium">Salva Modifiche</button>
@@ -517,26 +653,43 @@
         </div>
     </div>
 
-    <!-- MODALE MAPPING MULTIPLO -->
+    <!-- 7. MODALE INSERIMENTO MULTIPLO MAPPING BIB -->
     <div id="modal-mapping" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
                 <h3 class="font-bold text-lg text-cyan-700">Inserimento Multiplo Mapping BIB</h3>
-                <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal('modal-mapping')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Camera</label><input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Slot Comune</label><input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Camera</label>
+                        <input id="in-map-cam" type="text" placeholder="DM24 ch1" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Slot Comune</label>
+                        <input id="in-map-slot" type="text" placeholder="Socket 1-32" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">ID BIB (Inserisci multipli separati da virgola o spazio)</label>
-                    <textarea id="in-map-bibs" rows="2" placeholder="BIB-014, BIB-015, BIB-016..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ID BIB (Separate da virgola, spazio o a capo)</label>
+                    <textarea id="in-map-bibs" rows="3" placeholder="BIB-014, BIB-015, BIB-016..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Device</label><input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Lotto</label><input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta</label><input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Device</label>
+                        <input id="in-map-dev" type="text" placeholder="32 pz" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Lotto</label>
+                        <input id="in-map-lot" type="text" placeholder="CHROMITEM" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ricetta</label>
+                        <input id="in-map-rec" type="text" placeholder="HTOL_125" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    </div>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
@@ -546,20 +699,23 @@
         </div>
     </div>
 
+    <!-- 8. MODALE NUOVO TICKET MANUTENZIONE -->
     <div id="modal-ticket" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
                 <h3 class="font-bold text-lg text-amber-700">Segnala Guasto ai Manutentori</h3>
-                <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Manutenzione Destinataria</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Manutenzione</label>
                     <input id="in-tkt-email" type="email" value="manutenzione@gqr-lab.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Descrizione Guasto / Macchina</label>
-                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Errore temperatura" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                    <input id="in-tkt-title" type="text" placeholder="es. DM24 ch2 - Errore sonda temperatura" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Priorità</label>
@@ -571,16 +727,19 @@
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
                 <button onclick="closeModal('modal-ticket')" class="px-4 py-2 rounded-lg text-sm bg-slate-200 hover:bg-slate-300 text-slate-700">Annulla</button>
-                <button onclick="sendMaintenanceEmail()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 text-white font-medium"><i class="fa-solid fa-paper-plane mr-1"></i> Invia a Manutentori</button>
+                <button onclick="sendMaintenanceEmail()" class="px-4 py-2 rounded-lg text-sm bg-amber-600 hover:bg-amber-500 text-white font-medium">Invia a Manutentori</button>
             </div>
         </div>
     </div>
 
+    <!-- 9. MODALE LOGBOOK / CONSEGNE TURNO -->
     <div id="modal-log" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
                 <h3 class="font-bold text-lg text-purple-700">Passaggio Consegne Turno</h3>
-                <button onclick="closeModal('modal-log')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal('modal-log')" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
             <div class="space-y-3 text-sm">
                 <div class="grid grid-cols-2 gap-3">
@@ -593,12 +752,12 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Operatore</label>
-                        <input id="in-log-author" type="text" placeholder="Nome operatore" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
+                        <input id="in-log-author" type="text" placeholder="Nome" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nota per il turno successivo</label>
-                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne, Arelis..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></textarea>
+                    <textarea id="in-log-text" rows="3" placeholder="Scrivi consegne..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
@@ -608,10 +767,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATIVO -->
+    <!-- ========================================================================= -->
+    <!-- LOGICA JAVASCRIPT APPLICATIVA                                             -->
+    <!-- ========================================================================= -->
     <script>
         const LAB_PASSWORD = "gqr123";
 
+        // Configurazione Firebase Realtime Database
         const firebaseConfig = {
             apiKey: "AIzaSyBgv2XR_umTgSp62f_AoqvJpgNVHe2hXC4",
             authDomain: "gqr-lab-db.firebaseapp.com",
@@ -619,20 +781,43 @@
             projectId: "gqr-lab-db",
             storageBucket: "gqr-lab-db.firebasestorage.app",
             messagingSenderId: "390584430231",
-            appId: "1:390584430231:web:0b8a4347301a3c4bfe83d2",
-            measurementId: "G-QGYS3WKDX2"
+            appId: "1:390584430231:web:0b8a4347301a3c4bfe83d2"
         };
 
         let db = null;
         let isCloudActive = false;
         let currentFilter = 'ALL';
 
+        // Stato iniziale predefinito
         let appState = {
             ovens: [
-                { id: 1, name: 'DM24 ch1', lot: 'CHROMITEM M02B', trialId: 'TR-2026-01', recipe: 'tc_125', label: 'LBL-A', temp: '125°C', stepHours: 48, accumulatedHours: 0, startDate: new Date().toISOString().slice(0,10), startTime: '08:00', dueDate: new Date().toISOString().slice(0,10), status: 'In Camera', arelisSynced: false, machineImage: '', bibsList: 'BIB-012, BIB-013' }
+                {
+                    id: 1,
+                    name: 'DM24 ch1',
+                    lot: 'CHROMITEM M02B',
+                    trialId: 'TR-2026-01',
+                    recipe: 'tc_125',
+                    label: 'LBL-A',
+                    temp: '125°C',
+                    stepHours: 48,
+                    accumulatedHours: 0,
+                    startDate: new Date().toISOString().slice(0, 10),
+                    startTime: '08:00',
+                    dueDate: new Date().toISOString().slice(0, 10),
+                    status: 'In Camera',
+                    arelisSynced: false,
+                    machineImage: '',
+                    bibsList: 'BIB-012, BIB-013'
+                }
             ],
             plannerEmails: [
-                { id: 1, title: 'Planning di Esempio (Domani)', date: '14/11/2026', text: 'Camera DM24 ch1 - Lotto CHROMITEM - Trial TR-01', status: 'In Arrivo / Previsto' }
+                {
+                    id: 1,
+                    title: 'Planning di Esempio (Domani)',
+                    date: '14/11/2026',
+                    text: 'Camera DM24 ch1 - Lotto CHROMITEM - Trial TR-01',
+                    status: 'In Arrivo / Previsto'
+                }
             ],
             history: [],
             mapping: [],
@@ -640,11 +825,17 @@
             archive: [],
             maintenance: [],
             logbook: [
-                { id: 1, shift: 'Mattina (06:00 - 14:00)', author: 'Team Lab', date: '14/11/2026 14:00', text: 'Tema chiaro professionale, countdown in tempo reale e ricerca globale attivi.' }
+                {
+                    id: 1,
+                    shift: 'Mattina (06:00 - 14:00)',
+                    author: 'Team Lab',
+                    date: '14/11/2026 14:00',
+                    text: 'Inventario Excel aggiornato con mappatura colonne.'
+                }
             ]
         };
 
-        // --- GESTIONE LOGIN UTENTI ---
+        // --- GESTIONE AUTENTICAZIONE / LOGIN ---
         function handleLogin() {
             const user = document.getElementById('login-user').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
@@ -654,9 +845,18 @@
                 sessionStorage.setItem('gqr_logged_in', 'true');
                 sessionStorage.setItem('gqr_user', user);
                 document.getElementById('login-screen').classList.add('hidden');
+                errorEl.classList.add('hidden');
             } else {
                 errorEl.classList.remove('hidden');
             }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('gqr_logged_in');
+            sessionStorage.removeItem('gqr_user');
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+            document.getElementById('login-screen').classList.remove('hidden');
         }
 
         function checkSession() {
@@ -667,19 +867,26 @@
             }
         }
 
+        // --- INIZIALIZZAZIONE APP & FIREBASE ---
         function initApp() {
             checkSession();
             try {
                 if (typeof firebase !== 'undefined' && firebaseConfig.apiKey) {
-                    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
                     db = firebase.database(undefined, firebaseConfig.databaseURL);
                     
                     let connected = false;
                     const safetyTimer = setTimeout(() => {
-                        if (!connected) { updateStatus(false); loadLocal(); renderAll(); }
+                        if (!connected) {
+                            updateStatus(false);
+                            loadLocal();
+                            renderAll();
+                        }
                     }, 3500);
 
-                    db.ref('gqr_lab_v13').on('value', (snapshot) => {
+                    db.ref('gqr_lab_v17').on('value', (snapshot) => {
                         connected = true;
                         clearTimeout(safetyTimer);
                         const val = snapshot.val();
@@ -696,12 +903,25 @@
                             };
                             renderAll();
                         } else {
-                            db.ref('gqr_lab_v13').set(appState);
+                            db.ref('gqr_lab_v17').set(appState);
                         }
                         updateStatus(true);
-                    }, () => { clearTimeout(safetyTimer); updateStatus(false); loadLocal(); renderAll(); });
-                } else { updateStatus(false); loadLocal(); renderAll(); }
-            } catch (e) { updateStatus(false); loadLocal(); renderAll(); }
+                    }, () => {
+                        clearTimeout(safetyTimer);
+                        updateStatus(false);
+                        loadLocal();
+                        renderAll();
+                    });
+                } else {
+                    updateStatus(false);
+                    loadLocal();
+                    renderAll();
+                }
+            } catch (e) {
+                updateStatus(false);
+                loadLocal();
+                renderAll();
+            }
         }
 
         function updateStatus(active) {
@@ -713,25 +933,34 @@
                 text.innerText = "Cloud Live";
             } else {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                text.innerText = "Offline";
+                text.innerText = "Offline (Locale)";
             }
         }
 
         function saveState() {
             try {
-                localStorage.setItem('gqr_lab_v13', JSON.stringify(appState));
-                if (isCloudActive && db) db.ref('gqr_lab_v13').set(appState);
-            } catch (e) {}
+                localStorage.setItem('gqr_lab_v17', JSON.stringify(appState));
+                if (isCloudActive && db) {
+                    db.ref('gqr_lab_v17').set(appState);
+                }
+            } catch (e) {
+                console.error("Errore salvataggio stato:", e);
+            }
             renderAll();
         }
 
         function loadLocal() {
             try {
-                const saved = localStorage.getItem('gqr_lab_v13');
-                if (saved) appState = JSON.parse(saved);
-            } catch (e) {}
+                const saved = localStorage.getItem('gqr_lab_v17');
+                if (saved) {
+                    appState = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.error("Errore caricamento locale:", e);
+            }
         }
 
+        // --- GESTIONE MODALI & SCHEDE ---
         function openModal(id) {
             const el = document.getElementById(id);
             el.classList.remove('hidden');
@@ -740,14 +969,14 @@
             if (id === 'modal-oven') {
                 const now = new Date();
                 if (!document.getElementById('in-oven-startdate').value) {
-                    document.getElementById('in-oven-startdate').value = now.toISOString().slice(0,10);
+                    document.getElementById('in-oven-startdate').value = now.toISOString().slice(0, 10);
                 }
                 if (!document.getElementById('in-oven-starttime').value) {
-                    document.getElementById('in-oven-starttime').value = now.toTimeString().slice(0,5);
+                    document.getElementById('in-oven-starttime').value = now.toTimeString().slice(0, 5);
                 }
                 if (!document.getElementById('in-oven-duedate').value) {
-                    const due = new Date(now.getTime() + 48*3600*1000);
-                    document.getElementById('in-oven-duedate').value = due.toISOString().slice(0,10);
+                    const due = new Date(now.getTime() + 48 * 3600 * 1000);
+                    document.getElementById('in-oven-duedate').value = due.toISOString().slice(0, 10);
                 }
             }
         }
@@ -768,6 +997,7 @@
         }
 
         function renderAll() {
+            renderDigitalTwinMap();
             renderSummaryCounters();
             renderLiveBibsInCamera();
             renderOvens();
@@ -779,54 +1009,159 @@
             renderLogbook();
         }
 
-        // --- COUNTERS PANORAMICA GIORNALIERA ---
-        function renderSummaryCounters() {
-            const todayStr = new Date().toISOString().slice(0,10);
-            
-            const departing = appState.ovens.filter(o => o.startDate === todayStr || o.status === 'In Camera').length;
-            document.getElementById('count-departing').innerText = `${departing} Prove`;
-
-            const unloading = appState.ovens.filter(o => o.dueDate === todayStr).length;
-            document.getElementById('count-unloading').innerText = `${unloading} Prove`;
-
-            const missing = (appState.plannerEmails || []).filter(p => p.status && p.status.includes('Mancante')).length;
-            document.getElementById('count-missing').innerText = `${missing} Segnalate`;
+        // --- DIGITAL TWIN REPARTO & GESTIONE MULTI-PROVA ---
+        function filterDigitalTwinDropdown() {
+            renderDigitalTwinMap();
         }
 
-        // --- MONITOR LIVE BIB IN CAMERA ---
-        function renderLiveBibsInCamera() {
-            const container = document.getElementById('live-bibs-container');
+        function renderDigitalTwinMap() {
+            const container = document.getElementById('digital-twin-map');
             if (!container) return;
 
-            const activeCameras = appState.ovens.filter(o => o.status === 'In Camera').map(o => o.name);
-            const busyBibs = appState.mapping.filter(m => activeCameras.includes(m.cam));
-
-            if (!busyBibs.length) {
-                container.innerHTML = `<span class="text-xs text-slate-400 italic">Nessuna BIB attualmente impegnata in camere attive. Tutte disponibili.</span>`;
-                return;
+            const selectedCam = document.getElementById('dt-camera-select')?.value || 'ALL';
+            let standardCameras = ['DM24 ch1', 'DM24 ch2', 'uHAST 1', 'uHAST 2', 'TC Chamber', 'HTS Lab'];
+            
+            if (selectedCam !== 'ALL') {
+                standardCameras = [selectedCam];
             }
 
-            container.innerHTML = busyBibs.map((b) => `
-                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 text-xs font-semibold text-sky-800 shadow-sm">
-                    <i class="fa-solid fa-microchip text-sky-600"></i>
-                    <span><b>${b.bib}</b></span>
-                    <span class="text-slate-500">(${b.cam})</span>
-                    <span class="bg-white px-1.5 py-0.5 rounded text-[10px] text-slate-600 ml-1 border border-slate-200">Lotto: ${b.lot}</span>
-                </div>
-            `).join('');
+            container.innerHTML = standardCameras.map(camName => {
+                const chamberOvens = appState.ovens.filter(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
+                const activeCount = chamberOvens.length;
+                
+                const bgClass = activeCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-900 shadow-sm' : 'bg-white border-slate-200 text-slate-500';
+                const statusDotColor = activeCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300';
+                
+                let previewHtml = `<p class="text-[11px] text-slate-400 italic py-2">Nessuna prova attiva in questa camera</p>`;
+                if (activeCount > 0) {
+                    previewHtml = chamberOvens.map((o, idx) => `
+                        <div class="bg-white/95 border border-sky-200 rounded-lg p-2.5 space-y-1 mt-2 text-xs shadow-xs">
+                            <div class="flex justify-between items-center font-bold text-slate-800">
+                                <span>#${idx + 1} - Lotto: ${o.lot}</span>
+                                <span class="bg-sky-600 text-white text-[10px] px-1.5 py-0.5 rounded">${o.recipe}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600">Temp: ${o.temp} &bull; Scadenza: ${o.dueDate}</p>
+                            ${o.trialId ? `<p class="text-[10px] font-mono text-sky-700">Trial: ${o.trialId}</p>` : ''}
+                        </div>
+                    `).join('');
+                }
+
+                return `
+                <div class="border rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-sm ${bgClass}">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-temperature-high mr-1.5 text-sky-600"></i>${camName}
+                        </span>
+                        <span class="w-3 h-3 rounded-full ${statusDotColor}"></span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-semibold text-slate-700">${activeCount} Prova/e in corso</span>
+                        ${previewHtml}
+                    </div>
+                    <div class="pt-2 border-t border-slate-200/60 flex justify-end">
+                        <button onclick="openChamberDetailModal('${camName}')" class="text-xs bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg font-semibold transition">
+                            <i class="fa-solid fa-gear mr-1"></i> Gestisci Postazione
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        // --- PLANNER & EMAIL LIST ---
+        function openChamberDetailModal(camName) {
+            document.getElementById('chamber-detail-title').innerHTML = `<i class="fa-solid fa-door-closed mr-2 text-sky-600"></i>Postazione: ${camName}`;
+            const listContainer = document.getElementById('chamber-detail-list');
+            const chamberOvens = appState.ovens.filter(o => o.name.toLowerCase() === camName.toLowerCase() && o.status === 'In Camera');
+
+            if (!chamberOvens.length) {
+                listContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border border-slate-200">Nessuna prova attualmente in corso in questa postazione.</div>`;
+            } else {
+                listContainer.innerHTML = chamberOvens.map((o, idx) => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-800 text-sm">#${idx + 1} - Lotto: ${o.lot}</span>
+                            ${o.trialId ? `<span class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-mono text-[10px] font-bold border border-sky-200">Trial: ${o.trialId}</span>` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-600">
+                            <div>Ricetta: <b class="text-slate-800">${o.recipe}</b></div>
+                            <div>Temperatura: <b class="text-slate-800">${o.temp}</b></div>
+                            <div>Scadenza: <b class="text-slate-800">${o.dueDate}</b></div>
+                            <div>BIB: <b class="text-slate-800">${o.bibsList}</b></div>
+                        </div>
+                        <div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
+                            <button onclick="closeModal('modal-chamber-detail'); openUnloadModal(${o.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded text-xs font-semibold">Termina Step</button>
+                            <button onclick="closeModal('modal-chamber-detail'); openQrModal(${o.id})" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-1 rounded text-xs font-semibold">Mostra QR</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            openModal('modal-chamber-detail');
+        }
+
+        // --- DETTATURA VOCALE ---
+        function startVoiceDictation() {
+            const statusEl = document.getElementById('speech-status');
+            const btn = document.getElementById('btn-mic');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Il tuo browser non supporta la dettatura vocale.");
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'it-IT';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            statusEl.innerText = "Ascolto in corso... Parla ora.";
+            btn.classList.add('bg-red-600', 'animate-pulse');
+
+            recognition.onresult = function(event) {
+                const speechText = event.results[0][0].transcript;
+                statusEl.innerText = `Trasmesso: "${speechText}"`;
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+                document.getElementById('in-oven-lot').value = speechText;
+            };
+
+            recognition.onerror = function() {
+                statusEl.innerText = "Errore di ascolto o microfono bloccato.";
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+            };
+
+            recognition.onend = function() {
+                btn.classList.remove('bg-red-600', 'animate-pulse');
+            };
+
+            recognition.start();
+        }
+
+        // --- PARSER EMAIL PLANNER ---
+        function parseAndSavePlannerEmail() {
+            const rawText = document.getElementById('in-plan-text').value.trim();
+            if (!rawText) return alert("Incolla il testo dell'email prima di salvare!");
+            const status = document.getElementById('in-plan-status').value;
+            const lines = rawText.split('\n');
+            const title = lines[0].length > 45 ? lines[0].slice(0, 45) + '...' : (lines[0] || 'Planning Operativo');
+            
+            appState.plannerEmails.unshift({
+                id: Date.now(),
+                title,
+                date: new Date().toLocaleString('it-IT'),
+                text: rawText,
+                status
+            });
+            
+            document.getElementById('in-plan-text').value = '';
+            closeModal('modal-planner');
+            saveState();
+        }
+
         function renderPlannerEmails() {
             const container = document.getElementById('planner-list');
             if (!container) return;
             const list = appState.plannerEmails || [];
-
             if (!list.length) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm bg-white rounded-xl border border-slate-200">Nessun planning email inserito. Incolla il planning dei planner per il turno di mattina.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-sm bg-white rounded-xl border border-slate-200">Nessun planning email inserito.</div>`;
                 return;
             }
-
             container.innerHTML = list.map(p => {
                 const isMissing = p.status && p.status.includes('Mancante');
                 return `
@@ -834,7 +1169,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-envelope mr-2"></i>${p.title}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Salvato il: ${p.date}</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Salvato il: ${p.date}</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="px-2.5 py-1 rounded text-xs font-bold border ${isMissing ? 'bg-red-100 text-red-700 border-red-300 animate-pulse' : 'bg-emerald-100 text-emerald-700 border-emerald-300'}">${p.status}</span>
@@ -846,33 +1181,65 @@
             }).join('');
         }
 
-        function saveNewPlannerPlan() {
-            const title = document.getElementById('in-plan-title').value.trim() || 'Planning Email Planner';
-            const text = document.getElementById('in-plan-text').value.trim();
-            const status = document.getElementById('in-plan-status').value;
-
-            if (!text) return alert("Inserisci il testo della email dei planner!");
-
-            appState.plannerEmails.unshift({
-                id: Date.now(),
-                title,
-                date: new Date().toLocaleString('it-IT'),
-                text,
-                status
-            });
-
-            document.getElementById('in-plan-text').value = '';
-            document.getElementById('in-plan-title').value = '';
-            closeModal('modal-planner');
-            saveState();
-        }
-
         function deletePlannerPlan(id) {
             appState.plannerEmails = appState.plannerEmails.filter(x => x.id !== id);
             saveState();
         }
 
-        // --- DASHBOARD CAMERE ORDINATA & PULITA CON COUNTDOWN ---
+        // --- QR CODE & ANTEPRIMA ---
+        function openQrModal(ovenId) {
+            const o = appState.ovens.find(x => x.id === ovenId);
+            if (!o) return;
+            document.getElementById('img-modal-title').innerText = `QR Code & Dettagli - ${o.name} (${o.lot})`;
+            const qrContainer = document.getElementById('qrcode-container');
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: `GQR LAB | Camera: ${o.name} | Lotto: ${o.lot} | Trial: ${o.trialId || 'N/D'} | Scadenza: ${o.dueDate} | BIB: ${o.bibsList}`,
+                width: 160,
+                height: 160,
+                colorDark: "#0284c7",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            const imgPreviewWrapper = document.getElementById('img-preview-wrapper');
+            if (o.machineImage) {
+                document.getElementById('modal-oven-img-preview').src = o.machineImage;
+                imgPreviewWrapper.classList.remove('hidden');
+                imgPreviewWrapper.classList.add('flex');
+            } else {
+                imgPreviewWrapper.classList.add('hidden');
+                imgPreviewWrapper.classList.remove('flex');
+            }
+            openModal('modal-view-image');
+        }
+
+        // --- CONTATORI & DASHBOARD PROVE ---
+        function renderSummaryCounters() {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            document.getElementById('count-departing').innerText = `${appState.ovens.filter(o => o.startDate === todayStr || o.status === 'In Camera').length} Prove`;
+            document.getElementById('count-unloading').innerText = `${appState.ovens.filter(o => o.dueDate === todayStr).length} Prove`;
+            document.getElementById('count-missing').innerText = `${(appState.plannerEmails || []).filter(p => p.status && p.status.includes('Mancante')).length} Segnalate`;
+        }
+
+        function renderLiveBibsInCamera() {
+            const container = document.getElementById('live-bibs-container');
+            if (!container) return;
+            const activeCameras = appState.ovens.filter(o => o.status === 'In Camera').map(o => o.name);
+            const busyBibs = appState.mapping.filter(m => activeCameras.includes(m.cam));
+            if (!busyBibs.length) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">Nessuna BIB attualmente impegnata in camere attive.</span>`;
+                return;
+            }
+            container.innerHTML = busyBibs.map((b) => `
+                <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50 text-xs font-semibold text-sky-800 shadow-sm">
+                    <i class="fa-solid fa-microchip text-sky-600"></i>
+                    <span><b>${b.bib}</b></span>
+                    <span class="text-slate-500">(${b.cam})</span>
+                    <span class="bg-white px-1.5 py-0.5 rounded text-[10px] text-slate-600 ml-1 border">Lotto: ${b.lot}</span>
+                </div>
+            `).join('');
+        }
+
         function filterOvens(flt) {
             currentFilter = flt;
             document.querySelectorAll('.flt-btn').forEach(b => {
@@ -883,11 +1250,11 @@
         }
 
         function renderOvens() {
-            const todayStr = new Date().toISOString().slice(0,10);
+            const todayStr = new Date().toISOString().slice(0, 10);
             const searchQuery = (document.getElementById('search-ovens-input')?.value || '').toLowerCase();
-            
             const pendingArelis = appState.ovens.filter(o => !o.arelisSynced).length;
             const alertBadge = document.getElementById('arelis-alert-badge');
+            
             if (pendingArelis > 0) {
                 alertBadge.classList.remove('hidden');
                 alertBadge.classList.add('flex');
@@ -906,42 +1273,32 @@
                     (o.name && o.name.toLowerCase().includes(searchQuery)) ||
                     (o.lot && o.lot.toLowerCase().includes(searchQuery)) ||
                     (o.trialId && o.trialId.toLowerCase().includes(searchQuery)) ||
+                    (o.recipe && o.recipe.toLowerCase().includes(searchQuery)) ||
                     (o.bibsList && o.bibsList.toLowerCase().includes(searchQuery))
                 );
             }
 
             const container = document.getElementById('ovens-grid');
             if (!list.length) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessuna prova trovata in questa vista.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessuna prova trovata per i criteri selezionati.</div>`;
                 return;
             }
 
             const now = new Date().getTime();
-
             container.innerHTML = list.map(o => {
                 const isDueToday = o.dueDate === todayStr;
-                const statusBadge = o.status === 'In Camera' 
-                    ? 'bg-sky-100 text-sky-800 border-sky-200' 
-                    : 'bg-purple-100 text-purple-800 border-purple-200';
-
-                // Calcolo Countdown / Progresso
+                const statusBadge = o.status === 'In Camera' ? 'bg-sky-100 text-sky-800 border-sky-200' : 'bg-purple-100 text-purple-800 border-purple-200';
                 let dueTime = new Date(`${o.dueDate}T23:59:59`).getTime();
                 let startTime = new Date(`${o.startDate || todayStr}T${o.startTime || '00:00'}`).getTime();
                 let totalDuration = dueTime - startTime;
                 let elapsed = now - startTime;
                 let pct = totalDuration > 0 ? Math.min(Math.max((elapsed / totalDuration) * 100, 5), 100) : 100;
-                
-                let timeRemainingMs = dueTime - now;
-                let hoursRemaining = Math.ceil(timeRemainingMs / (1000 * 60 * 60));
+                let hoursRemaining = Math.ceil((dueTime - now) / (1000 * 60 * 60));
                 let countdownText = hoursRemaining > 0 ? `Mancano ~${hoursRemaining}h alla scadenza` : `Scaduto / In scadenza`;
 
                 const actionBtn = o.status === 'In Camera'
                     ? `<button onclick="openUnloadModal(${o.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-arrow-right-from-bracket mr-1.5"></i> Termina Step & Registra Fail</button>`
-                    : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-rotate-left mr-1.5"></i> Rientrato: Ricarica in Camera</button>`;
-
-                const imgButton = o.machineImage 
-                    ? `<button onclick="viewOvenImage(${o.id})" class="text-xs bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded border border-sky-200 flex items-center gap-1 font-medium"><i class="fa-solid fa-image"></i> Vedi Immagine</button>`
-                    : `<span class="text-[11px] text-slate-400 italic">Nessuna immagine</span>`;
+                    : `<button onclick="advanceOvenFlow(${o.id})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-3 rounded-lg text-xs font-semibold transition text-center shadow-sm"><i class="fa-solid fa-rotate-left mr-1.5"></i> Ricarica in Camera</button>`;
 
                 return `
                 <div class="bg-white border ${!o.arelisSynced ? 'border-red-300 shadow-red-50/50' : (isDueToday ? 'border-amber-400 shadow-amber-50/50' : 'border-slate-200')} rounded-2xl p-4 shadow-sm flex flex-col justify-between space-y-3">
@@ -950,8 +1307,6 @@
                             <h3 class="font-bold text-base text-slate-800 flex items-center"><i class="fa-solid fa-door-closed mr-2 text-sky-600"></i>${o.name}</h3>
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge}">${o.status}</span>
                         </div>
-                        
-                        <!-- Barra Progresso Timer -->
                         <div class="space-y-1">
                             <div class="flex justify-between text-[11px] text-slate-500 font-medium">
                                 <span>${countdownText}</span>
@@ -961,7 +1316,6 @@
                                 <div class="bg-sky-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
                             </div>
                         </div>
-
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
                             <div class="flex justify-between items-center">
                                 <p class="text-slate-900 font-semibold flex items-center"><i class="fa-solid fa-barcode mr-2 text-sky-600"></i>${o.lot}</p>
@@ -970,26 +1324,22 @@
                             <p class="text-slate-700 flex items-center"><i class="fa-solid fa-temperature-high mr-2 text-red-500"></i>${o.temp} &bull; Ricetta: <b class="ml-1 text-slate-900">${o.recipe}</b></p>
                             ${o.label ? `<p class="text-amber-700 flex items-center"><i class="fa-solid fa-tag mr-2"></i> Label: <b>${o.label}</b></p>` : ''}
                             <p class="text-slate-500 flex items-center"><i class="fa-regular fa-clock mr-2 text-sky-600"></i> Inizio: <b>${o.startDate || 'N/D'} ${o.startTime || ''}</b></p>
-                            <p class="text-slate-500 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-600 font-bold' : 'text-slate-700'}">${o.dueDate || 'N/D'}</b> (Tot: ${o.accumulatedHours}h)</p>
+                            <p class="text-slate-500 flex items-center"><i class="fa-regular fa-calendar mr-2"></i> Scadenza: <b class="${isDueToday ? 'text-amber-600 font-bold' : 'text-slate-700'}">${o.dueDate || 'N/D'}</b></p>
                             <p class="text-slate-700 pt-1.5 border-t border-slate-200 flex items-center"><i class="fa-solid fa-microchip mr-2 text-sky-600"></i> BIB: <b class="ml-1 text-slate-900">${o.bibsList || 'N/D'}</b></p>
                         </div>
                     </div>
-
                     <div class="space-y-2 pt-1">
                         <div class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
-                            <span class="text-xs text-slate-500 font-medium">Report Macchina:</span>
-                            ${imgButton}
+                            <span class="text-xs text-slate-500 font-medium">QR Code & Report:</span>
+                            <button onclick="openQrModal(${o.id})" class="text-xs bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded border border-sky-200 flex items-center gap-1 font-medium"><i class="fa-solid fa-qrcode"></i> Mostra QR</button>
                         </div>
-
                         <button onclick="toggleArelis(${o.id})" class="w-full py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${o.arelisSynced ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-300 animate-pulse'}">
                             <i class="fa-solid ${o.arelisSynced ? 'fa-circle-check text-emerald-600' : 'fa-circle-exclamation text-red-600'}"></i>
                             ${o.arelisSynced ? 'Arelis Aggiornato' : 'DA REGISTRARE SU ARELIS'}
                         </button>
-
                         ${actionBtn}
-
                         <div class="flex justify-end pt-1">
-                            <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina (Protetto)</button>
+                            <button onclick="openEditOven(${o.id})" class="text-xs text-slate-400 hover:text-slate-600 px-2 py-1"><i class="fa-solid fa-lock mr-1"></i> Modifica / Elimina</button>
                         </div>
                     </div>
                 </div>`;
@@ -999,21 +1349,12 @@
         function saveNewOven() {
             const name = document.getElementById('in-oven-name').value.trim();
             if (!name) return alert("Inserisci il nome della camera!");
-            
             const lot = document.getElementById('in-oven-lot').value.trim() || 'N/D';
             const trialId = document.getElementById('in-oven-trial').value.trim() || '';
             const recipe = document.getElementById('in-oven-recipe').value.trim() || 'Standard';
             const label = document.getElementById('in-oven-label').value.trim() || '';
             const rawBibs = document.getElementById('in-oven-bibs').value.trim();
             const fileInput = document.getElementById('in-oven-file');
-
-            // --- ALERT POP-UP ---
-            alert("⚡ PROMEMORIA CHECK FUSE: Assicurati di aver effettuato il controllo dei fusibili prima di avviare la prova!");
-
-            const recipeLower = recipe.toLowerCase();
-            if (recipeLower.includes('tc') || recipeLower.includes('bhast')) {
-                alert("🛡️ PROTOCOLLO SICUREZZA BIB: Per test TC o BHAST, ricorda di indossare i guanti per caricare i pezzi nelle BIB!");
-            }
 
             const createOvenObj = (imgBase64) => {
                 const newOven = {
@@ -1026,20 +1367,19 @@
                     temp: document.getElementById('in-oven-temp').value.trim() || '125°C',
                     stepHours: parseInt(document.getElementById('in-oven-step').value) || 48,
                     accumulatedHours: 0,
-                    startDate: document.getElementById('in-oven-startdate').value || new Date().toISOString().slice(0,10),
+                    startDate: document.getElementById('in-oven-startdate').value || new Date().toISOString().slice(0, 10),
                     startTime: document.getElementById('in-oven-starttime').value || '08:00',
-                    dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0,10),
+                    dueDate: document.getElementById('in-oven-duedate').value || new Date().toISOString().slice(0, 10),
                     status: 'In Camera',
                     arelisSynced: document.getElementById('in-oven-arelis').checked,
                     machineImage: imgBase64 || '',
                     bibsList: rawBibs || 'N/D'
                 };
-
                 appState.ovens.unshift(newOven);
 
+                // Aggiunta automatica delle BIB al mapping rapido
                 if (rawBibs) {
-                    const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
-                    bibsArray.forEach(bib => {
+                    rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0).forEach(bib => {
                         appState.mapping.push({
                             id: Date.now() + Math.random(),
                             cam: name,
@@ -1052,27 +1392,25 @@
                     });
                 }
 
+                // Reset campi modale
+                document.getElementById('in-oven-name').value = '';
+                document.getElementById('in-oven-lot').value = '';
+                document.getElementById('in-oven-trial').value = '';
+                document.getElementById('in-oven-label').value = '';
+                document.getElementById('in-oven-bibs').value = '';
+                document.getElementById('in-oven-file').value = '';
+
                 closeModal('modal-oven');
                 saveState();
             };
 
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    createOvenObj(e.target.result);
-                };
+                reader.onload = function(e) { createOvenObj(e.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 createOvenObj('');
             }
-        }
-
-        function viewOvenImage(id) {
-            const o = appState.ovens.find(x => x.id === id);
-            if (!o || !o.machineImage) return;
-            document.getElementById('img-modal-title').innerText = `Report Macchina - ${o.name} (${o.lot})`;
-            document.getElementById('modal-oven-img-preview').src = o.machineImage;
-            openModal('modal-view-image');
         }
 
         function toggleArelis(id) {
@@ -1086,7 +1424,7 @@
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
             document.getElementById('unload-oven-id').value = o.id;
-            document.getElementById('unload-info-text').innerHTML = `Camera: <b>${o.name}</b><br>Lotto: <b>${o.lot}</b> ${o.trialId ? '(Trial: ' + o.trialId + ')' : ''}<br>Completamento Step: <b>+${o.stepHours}h</b>`;
+            document.getElementById('unload-info-text').innerHTML = `Camera: <b>${o.name}</b><br>Lotto: <b>${o.lot}</b>`;
             document.getElementById('in-unload-fails').value = 0;
             document.getElementById('in-unload-notes').value = '';
             openModal('modal-unload-fail');
@@ -1096,7 +1434,6 @@
             const id = parseInt(document.getElementById('unload-oven-id').value);
             const o = appState.ovens.find(x => x.id === id);
             if (!o) return;
-
             const failsCount = document.getElementById('in-unload-fails').value || 0;
             const failNotes = document.getElementById('in-unload-notes').value.trim();
 
@@ -1116,7 +1453,6 @@
 
             closeModal('modal-unload-fail');
             saveState();
-            alert("Prova scaricata correttamente e registrata nello storico con i dati sui fail!");
         }
 
         function advanceOvenFlow(id) {
@@ -1124,8 +1460,7 @@
             if (!o) return;
             o.status = 'In Camera';
             o.arelisSynced = false;
-            o.startDate = new Date().toISOString().slice(0,10);
-            o.startTime = new Date().toTimeString().slice(0,5);
+            o.startDate = new Date().toISOString().slice(0, 10);
             saveState();
         }
 
@@ -1141,9 +1476,8 @@
         }
 
         function confirmEditOven() {
-            const pwd = document.getElementById('edit-oven-pwd').value;
-            if (pwd !== LAB_PASSWORD) {
-                alert("Password errata!");
+            if (document.getElementById('edit-oven-pwd').value !== LAB_PASSWORD) {
+                alert("Password Lab errata!");
                 return;
             }
             const id = parseInt(document.getElementById('edit-oven-id').value);
@@ -1155,17 +1489,15 @@
                 o.arelisSynced = false;
                 closeModal('modal-edit-oven');
                 saveState();
-                alert("Modifiche salvate!");
             }
         }
 
         function confirmDeleteOven() {
-            const pwd = document.getElementById('edit-oven-pwd').value;
-            if (pwd !== LAB_PASSWORD) {
-                alert("Password errata! Impossibile eliminare la prova.");
+            if (document.getElementById('edit-oven-pwd').value !== LAB_PASSWORD) {
+                alert("Password Lab errata!");
                 return;
             }
-            if (confirm("Vuoi davvero eliminare questa prova?")) {
+            if (confirm("Sei sicuro di voler eliminare definitivamente questa prova?")) {
                 const id = parseInt(document.getElementById('edit-oven-id').value);
                 appState.ovens = appState.ovens.filter(x => x.id !== id);
                 closeModal('modal-edit-oven');
@@ -1178,44 +1510,44 @@
             const query = (document.getElementById('search-history-input')?.value || '').toLowerCase();
             const tbody = document.getElementById('history-table-body');
             const filtered = appState.history.filter(h => 
-                h.lot.toLowerCase().includes(query) || h.name.toLowerCase().includes(query) || h.recipe.toLowerCase().includes(query)
+                h.lot.toLowerCase().includes(query) || 
+                h.name.toLowerCase().includes(query) ||
+                h.recipe.toLowerCase().includes(query)
             );
-
             if (!filtered.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Nessun record trovato nello storico.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Nessun record storico trovato.</td></tr>`;
                 return;
             }
-
             tbody.innerHTML = filtered.map(h => `
-                <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                <tr class="border-b border-slate-200 hover:bg-slate-50 text-xs">
                     <td class="p-3 text-slate-500">${h.date}</td>
                     <td class="p-3 font-bold text-sky-700">${h.name}</td>
                     <td class="p-3 font-semibold text-slate-800">${h.lot}</td>
                     <td class="p-3 text-amber-700">${h.recipe}</td>
                     <td class="p-3 text-slate-600">${h.hours}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 font-semibold">${h.fails || 'N/D'}</span></td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         }
 
-        // --- MAPPING BIB MULTIPLO ---
+        // --- MAPPING RAPIDO BIB ---
         function renderMapping() {
             const tbody = document.getElementById('mapping-table-body');
             if (!appState.mapping.length) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Nessuna riga di mapping.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Nessuna riga di mapping inserita.</td></tr>`;
                 return;
             }
             tbody.innerHTML = appState.mapping.map(m => `
-                <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                <tr class="border-b border-slate-200 hover:bg-slate-50 text-xs">
                     <td class="p-3 font-bold text-sky-700">${m.cam}</td>
                     <td class="p-3 font-semibold text-cyan-700">${m.bib}</td>
                     <td class="p-3 text-slate-600">${m.slot}</td>
                     <td class="p-3 text-slate-800">${m.dev}</td>
                     <td class="p-3 text-slate-600">${m.lot}</td>
                     <td class="p-3 text-amber-700">${m.rec}</td>
-                    <td class="p-3 text-right"><button onclick="deleteMapping(${m.id})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `).join('');
+                    <td class="p-3 text-right">
+                        <button onclick="deleteMapping(${m.id})" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`).join('');
         }
 
         function saveNewMappingMulti() {
@@ -1226,11 +1558,9 @@
             const lot = document.getElementById('in-map-lot').value.trim() || 'N/D';
             const rec = document.getElementById('in-map-rec').value.trim() || 'N/D';
 
-            if (!rawBibs) return alert("Inserisci almeno un ID BIB!");
+            if (!rawBibs) return alert("Inserisci almeno un codice BIB!");
 
-            const bibsArray = rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0);
-
-            bibsArray.forEach(bib => {
+            rawBibs.split(/[\n,\s]+/).filter(b => b.trim().length > 0).forEach(bib => {
                 appState.mapping.push({
                     id: Date.now() + Math.random(),
                     cam,
@@ -1242,9 +1572,9 @@
                 });
             });
 
+            document.getElementById('in-map-bibs').value = '';
             closeModal('modal-mapping');
             saveState();
-            alert(`Generate con successo ${bibsArray.length} righe di mapping!`);
         }
 
         function deleteMapping(id) {
@@ -1253,34 +1583,41 @@
         }
 
         function exportMappingFile() {
-            if (!appState.mapping.length) return alert("Nessun dato.");
-            const ws = XLSX.utils.json_to_sheet(appState.mapping);
+            if (!appState.mapping.length) return alert("Nessun dato da esportare.");
+            const exportData = appState.mapping.map(m => ({
+                Camera: m.cam,
+                BIB_ID: m.bib,
+                Slot: m.slot,
+                Device: m.dev,
+                Lotto: m.lot,
+                Ricetta: m.rec
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Mapping");
-            XLSX.writeFile(wb, "GQR_Mapping.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Mapping_BIB");
+            XLSX.writeFile(wb, `GQR_Mapping_${new Date().toISOString().slice(0, 10)}.xlsx`);
         }
 
-        // --- INVENTARIO & ARCHIVIO ---
+        // --- INVENTARIO & ARCHIVIO MAGAZZINO ---
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
             if (!appState.inventory.length) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Importa un file Excel.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Nessun elemento in inventario. Usa "Importa Excel".</td></tr>`;
             } else {
                 tbody.innerHTML = appState.inventory.map((i, idx) => `
-                    <tr class="border-b border-slate-200 hover:bg-slate-50 transition text-xs">
+                    <tr class="border-b border-slate-200 hover:bg-slate-50 text-xs">
                         <td class="p-3"><input type="checkbox" class="bib-checkbox accent-sky-600" data-index="${idx}"></td>
                         <td class="p-3 font-medium text-slate-800">${i.code}</td>
                         <td class="p-3 text-slate-600">${i.lot}</td>
                         <td class="p-3 text-slate-600">${i.qty}</td>
                         <td class="p-3 text-slate-600">${i.rack}</td>
                         <td class="p-3"><span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-semibold">${i.status}</span></td>
-                    </tr>
-                `).join('');
+                    </tr>`).join('');
             }
 
             const archBody = document.getElementById('archive-table-body');
             if (!appState.archive.length) {
-                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs">Nessuna BIB in archivio magazzino.</td></tr>`;
+                archBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs">Nessuna BIB archiviata per il magazzino.</td></tr>`;
             } else {
                 archBody.innerHTML = appState.archive.map(a => `
                     <tr class="border-b border-slate-200 text-xs">
@@ -1288,9 +1625,10 @@
                         <td class="p-3 text-slate-600">${a.lot}</td>
                         <td class="p-3 text-slate-600">${a.qty}</td>
                         <td class="p-3 text-slate-400">${a.date}</td>
-                        <td class="p-3 text-right"><button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border border-slate-200">Ripristina</button></td>
-                    </tr>
-                `).join('');
+                        <td class="p-3 text-right">
+                            <button onclick="restoreArchive(${a.id})" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded border">Ripristina</button>
+                        </td>
+                    </tr>`).join('');
             }
         }
 
@@ -1300,24 +1638,30 @@
 
         function archiveSelectedBibs() {
             const checkedBoxes = document.querySelectorAll('.bib-checkbox:checked');
-            if (!checkedBoxes.length) return alert("Seleziona almeno una BIB.");
-            
+            if (!checkedBoxes.length) return alert("Seleziona almeno una BIB da archiviare.");
             const indices = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.index));
-            const items = indices.map(idx => appState.inventory[idx]);
-
-            items.forEach(item => {
-                appState.archive.unshift({ ...item, id: Date.now() + Math.random(), date: new Date().toLocaleDateString('it-IT') });
+            indices.map(idx => appState.inventory[idx]).forEach(item => {
+                appState.archive.unshift({
+                    ...item,
+                    id: Date.now() + Math.random(),
+                    date: new Date().toLocaleDateString('it-IT')
+                });
             });
-
             appState.inventory = appState.inventory.filter((_, idx) => !indices.includes(idx));
+            document.getElementById('select-all-bib').checked = false;
             saveState();
-            alert("BIB spostate in archivio magazzino!");
         }
 
         function restoreArchive(id) {
             const item = appState.archive.find(x => x.id === id);
             if (!item) return;
-            appState.inventory.push({ code: item.code, lot: item.lot, qty: item.qty, rack: item.rack, status: 'Disponibile' });
+            appState.inventory.push({
+                code: item.code,
+                lot: item.lot,
+                qty: item.qty,
+                rack: item.rack,
+                status: 'Disponibile'
+            });
             appState.archive = appState.archive.filter(x => x.id !== id);
             saveState();
         }
@@ -1329,59 +1673,72 @@
             reader.onload = function(evt) {
                 try {
                     const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: "N/D"});
-                    
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "N/D" });
                     if (rows.length > 0) {
                         appState.inventory = rows.map(r => {
                             const keys = Object.keys(r);
-                            const getVal = (names) => { for (let k of keys) if (names.includes(k.toLowerCase().trim())) return r[k]; return null; };
+                            const getVal = (names) => {
+                                for (let k of keys) {
+                                    let ck = k.toLowerCase().trim().replace(/[\s_\/-]/g, '');
+                                    for (let n of names) {
+                                        let cn = n.toLowerCase().trim().replace(/[\s_\/-]/g, '');
+                                        if (ck === cn || ck.includes(cn) || cn.includes(ck)) return r[k];
+                                    }
+                                }
+                                return null;
+                            };
                             return {
-                                code: getVal(['codice', 'code', 'bib', 'id bib', 'articolo']) || r[keys[0]] || 'BIB-001',
-                                lot: getVal(['lotto', 'lot']) || (keys[1] ? r[keys[1]] : 'N/D'),
-                                qty: getVal(['quantita', 'quantità', 'qty', 'pezzi']) || (keys[2] ? r[keys[2]] : 0),
-                                rack: getVal(['rack', 'posizione', 'pos']) || (keys[3] ? r[keys[3]] : 'N/D'),
+                                code: String(getVal(['bibsn', 'bibs/n', 'bib', 'code', 'codice']) || 'N/D'),
+                                lot: String(getVal(['product', 'lotto', 'lot']) || 'N/D'),
+                                qty: 1,
+                                rack: `${getVal(['equipment', 'camera']) || 'N/D'} - ${getVal(['location', 'rack', 'posizione']) || 'N/D'}`,
                                 status: 'Disponibile'
                             };
-                        }).filter(i => i.code && i.code !== 'BIB-000');
-                        
+                        }).filter(i => i.code && i.code !== 'N/D');
                         saveState();
-                        alert("Inventario importato correttamente!");
+                        alert(`Importati ${appState.inventory.length} record nell'inventario!`);
                     }
-                } catch(err) { alert("Errore durante l'importazione del file Excel."); }
+                } catch (err) {
+                    alert("Errore nella lettura del file Excel.");
+                }
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // --- TICKET MANUTENZIONE ---
+        // --- TICKET MANUTENTORI ---
         function renderMaintenance() {
             const container = document.getElementById('maintenance-list');
             if (!appState.maintenance.length) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessun ticket di guasto attivo.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-sm bg-white rounded-xl border border-slate-200">Nessun ticket guasto aperto.</div>`;
                 return;
             }
             container.innerHTML = appState.maintenance.map(m => `
                 <div class="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center gap-3 shadow-sm">
                     <div>
                         <h4 class="font-bold text-sm text-slate-800">${m.title}</h4>
-                        <p class="text-xs text-slate-500 mt-1">${m.date} &bull; Destinatario: <b>${m.email}</b> &bull; Priorità: <span class="text-red-600 font-semibold">${m.priority}</span></p>
+                        <p class="text-xs text-slate-500 mt-1">${m.date} &bull; Priorità: <span class="text-red-600 font-semibold">${m.priority}</span></p>
                     </div>
-                    <button onclick="deleteTicket(${m.id})" class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded font-medium">Risolto</button>
-                </div>
-            `).join('');
+                    <button onclick="deleteTicket(${m.id})" class="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded font-medium">Segna Risolto</button>
+                </div>`).join('');
         }
 
         function sendMaintenanceEmail() {
             const email = document.getElementById('in-tkt-email').value.trim();
             const title = document.getElementById('in-tkt-title').value.trim();
             const prio = document.getElementById('in-tkt-prio').value;
-            if (!title) return alert("Inserisci la descrizione!");
-
-            appState.maintenance.unshift({ id: Date.now(), title, email, priority: prio, date: new Date().toLocaleString('it-IT') });
+            if (!title) return alert("Inserisci la descrizione del guasto!");
+            appState.maintenance.unshift({
+                id: Date.now(),
+                title,
+                email,
+                priority: prio,
+                date: new Date().toLocaleString('it-IT')
+            });
+            document.getElementById('in-tkt-title').value = '';
             saveState();
             closeModal('modal-ticket');
-
-            window.location.href = `mailto:${email}?subject=SEGNALAZIONE GUASTO LAB - Priorità ${prio}&body=Guasto segnalato:%0D%0A${encodeURIComponent(title)}`;
+            window.location.href = `mailto:${email}?subject=SEGNALAZIONE GUASTO LAB - Priorità ${prio}&body=${encodeURIComponent(title)}`;
         }
 
         function deleteTicket(id) {
@@ -1389,31 +1746,30 @@
             saveState();
         }
 
-        // --- LOGBOOK TURNI ---
+        // --- LOGBOOK / CONSEGNE TURNO ---
         function renderLogbook() {
             const container = document.getElementById('logbook-list');
             container.innerHTML = appState.logbook.map(l => `
                 <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between space-y-3">
                     <div class="flex justify-between items-start">
                         <span class="px-3 py-1 rounded-full text-xs font-bold ${l.shift.startsWith('Mattina') ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-purple-100 text-purple-800 border border-purple-200'}">${l.shift}</span>
-                        <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${l.date}</span>
+                        <span class="text-xs text-slate-400">${l.date}</span>
                     </div>
-                    <p class="text-sm text-slate-700 leading-relaxed">${l.text}</p>
-                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
-                        <span>Operatore: <b class="text-slate-800">${l.author}</b></span>
-                        <i class="fa-solid fa-circle-check text-emerald-600 font-medium"> Consegnato</i>
+                    <p class="text-sm text-slate-700 whitespace-pre-wrap">${l.text}</p>
+                    <div class="pt-3 border-t text-xs text-slate-500 flex justify-between items-center">
+                        <span>Operatore: <b>${l.author}</b></span>
+                        <span class="text-emerald-600 font-medium"><i class="fa-solid fa-circle-check mr-1"></i>Consegnato</span>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function saveNewLog() {
             const text = document.getElementById('in-log-text').value.trim();
-            if (!text) return;
+            if (!text) return alert("Scrivi una nota prima di pubblicare!");
             appState.logbook.unshift({
                 id: Date.now(),
                 shift: document.getElementById('in-log-shift').value,
-                author: document.getElementById('in-log-author').value.trim() || 'Operatore Lab',
+                author: document.getElementById('in-log-author').value.trim() || 'Operatore',
                 date: new Date().toLocaleString('it-IT'),
                 text
             });
@@ -1422,6 +1778,7 @@
             saveState();
         }
 
+        // Avvio applicazione al caricamento della pagina
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
